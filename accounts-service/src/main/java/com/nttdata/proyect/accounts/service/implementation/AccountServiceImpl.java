@@ -45,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account createAccount(Account account, Customer customer) {
+    public Account createAccount(Account account,AccountType accountType, Customer customer) {
 
 
         List<AccountOwner> owners = new ArrayList<>();
@@ -54,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
         owner.setCustomer(customer);
         owners.add(owner);
         account.setOwners(owners);
-
+        account.setType(accountType);
 
         Account accountDB = accountRepository.save(account);
         owner.setAccount(accountDB);
@@ -80,5 +80,16 @@ public class AccountServiceImpl implements AccountService {
     public Account getAccount(Long id) {
         return accountRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public AccountType getAccountType(Long id) {
+        return accountTypeRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public int getOwnedAccountsByCustomerId(Long id) {
+        return accountOwnerRepository.findByCustomerId(id).size();
+    }
+
 
 }

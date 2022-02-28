@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,19 +37,24 @@ public class AccountController {
         return customerClient.getCustomer(id);
     }
 
+    @GetMapping(value = "/getCustomer/totalAccounts/{id}")
+    public Integer getTotalOfCustomerAccounts(@PathVariable("id") Long id) {
+        return accountService.getOwnedAccountsByCustomerId(id);
+    }
+
     //get
     @GetMapping
     public ResponseEntity<List<Account>> listAllAccounts(@RequestParam(name = "type", required = false) Long typeId) {
         List<Account> accounts = new ArrayList<>();
         accounts = accountService.findAllAccounts();
 
-        List<Account> accountsFinal =  accounts.stream().map(account -> {
+        List<Account> accountsFinal = accounts.stream().map(account -> {
             List<AccountOwner> ownerList = mapOwners(account);
             account.setOwners(ownerList);
             return account;
         }).collect(Collectors.toList());
 
-        accountsFinal =  accountsFinal.stream().map(account -> {
+        accountsFinal = accountsFinal.stream().map(account -> {
             List<AccountSigner> signerList = mapSigners(account);
             account.setSigners(signerList);
             return account;
@@ -70,7 +76,7 @@ public class AccountController {
         account.setSigners(mapSigners(account));
 
         account.getOwners().stream().map(accountOwner -> {
-            log.info("{}",accountOwner.getCustomerId());
+            log.info("{}", accountOwner.getCustomerId());
             return accountOwner.getCustomerId();
 
         }).collect(Collectors.toList());
@@ -85,12 +91,30 @@ public class AccountController {
         log.info("Creating Account....");
         String customerDni = registrationRequestBody.getCustomerDni();
         Customer customerDB = customerClient.getCustomerByDni(customerDni).getBody();
-        if(customerDB==null){
-            log.info("CustomerNotFound By Dni");
+        if (customerDB == null) {
+            log.info("Customer Not Found");
             return ResponseEntity.notFound().build();
-        };
+        }
+        ;
+        AccountType accountType = accountService.getAccountType(registrationRequestBody.getAccountTypeId());
+        if (accountType == null) {
+            log.info("AccountType Not Found");
+            return ResponseEntity.notFound().build();
+        }
+        // A business customer can't have a fix-term account or savings account
+        if (customerDB.getCategory().getId() == 2 && (accountType.getId()==1 || accountType.getId()==3)) {
+            log.info("A business customer can't have a fix-term account or savings account");
+            return ResponseEntity.badRequest().build();
+        }
+        // A personal customer only can have one account
+        int numberOfAccounts = accountService.getOwnedAccountsByCustomerId(customerDB.getId());
+        if (customerDB.getCategory().getId() == 1 && numberOfAccounts >= 1) {
+            log.info("A personal customer only can have one account ");
+            return ResponseEntity.badRequest().build();
+        }
+
         Account newAccount = registrationRequestBody.getAccount();
-        Account accountDB = accountService.createAccount(newAccount,customerDB);
+        Account accountDB = accountService.createAccount(newAccount, accountType, customerDB);
         return ResponseEntity.ok(accountDB);
     }
 

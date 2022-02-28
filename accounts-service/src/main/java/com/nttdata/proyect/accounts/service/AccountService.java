@@ -12,7 +12,7 @@ public interface AccountService {
 
     List<Account> findAccountsByType(AccountType type);
 
-    Account createAccount(Account account, Customer customer );
+    Account createAccount(Account account,AccountType accountType, Customer customer );
 
     Account updateAccount(Account account);
 
@@ -20,4 +20,7 @@ public interface AccountService {
 
     Account getAccount(Long id);
 
+    AccountType getAccountType(Long id);
+
+    int getOwnedAccountsByCustomerId(Long id);
 }

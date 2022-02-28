@@ -7,4 +7,5 @@ import lombok.Data;
 public class RegistrationRequestBody {
     private String customerDni;
     private Account account;
+    private Long accountTypeId;
 }
