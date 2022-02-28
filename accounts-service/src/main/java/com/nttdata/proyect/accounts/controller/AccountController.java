@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -53,6 +54,16 @@ public class AccountController {
             return account;
         }).collect(Collectors.toList());
 
+//        if(typeId!=null){
+//            List<Account> accountsFilteredByType = accountsFinal.stream().map(account -> {
+//               if(Objects.equals(account.getType().getId(), typeId)){
+//                   return account;
+//               }else {
+//                   return null;
+//               }
+//            }).collect(Collectors.toList());
+//        }
+
         return ResponseEntity.ok(accountsFinal);
     }
 
@@ -73,7 +84,7 @@ public class AccountController {
     // -------------------Create a Account-------------------------------------------
 
     @PostMapping(value = "/register")
-    public ResponseEntity<Account> createCustomer(@RequestBody RegistrationRequestBody registrationRequestBody) {
+    public ResponseEntity<Account> createAccount(@RequestBody RegistrationRequestBody registrationRequestBody) {
         log.info("Creating Account....");
         String customerDni = registrationRequestBody.getCustomerDni();
         Customer customerDB = customerClient.getCustomerByDni(customerDni).getBody();

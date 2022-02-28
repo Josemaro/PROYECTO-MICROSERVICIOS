@@ -55,6 +55,10 @@ public class AccountServiceImpl implements AccountService {
         account.setOwners(owners);
 
         Account accountDB = accountRepository.save(account);
+        owner.setAccount(accountDB);
+        //If accountDB is successfully created
+        accountOwnerRepository.save(owner);
+
 
         return getAccount(accountDB.getId());
 
