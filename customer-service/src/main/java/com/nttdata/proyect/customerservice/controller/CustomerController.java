@@ -6,10 +6,7 @@ import com.nttdata.proyect.customerservice.service.CustomerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,12 +31,23 @@ public class CustomerController {
             category.setId(categoryId);
             customers = customerService.findCustomersByCategory(category);
             if ( null == customers ) {
-                log.error("Customers with Region id {} not found.", category);
+                log.error("Customers with category id {} not found.", category);
                 return  ResponseEntity.notFound().build();
             }
         }
 
         return  ResponseEntity.ok(customers);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id) {
+        log.info("Fetching Customer with id {}", id);
+        Customer customer = customerService.getCustomer(id);
+        if (  null == customer) {
+            log.error("Customer with id {} not found.", id);
+            return  ResponseEntity.notFound().build();
+        }
+        return  ResponseEntity.ok(customer);
     }
 
 }
