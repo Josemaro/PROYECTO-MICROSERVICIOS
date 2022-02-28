@@ -41,19 +41,13 @@ public class AccountController {
         accounts = accountService.findAllAccounts();
 
         List<Account> accountsFinal =  accounts.stream().map(account -> {
-            List<AccountOwner> ownerList = account.getOwners().stream().map(owner -> {
-                owner.setCustomer(getCustomer(owner.getCustomerId()).getBody());
-                return owner;
-            }).collect(Collectors.toList());
+            List<AccountOwner> ownerList = mapOwners(account);
             account.setOwners(ownerList);
             return account;
         }).collect(Collectors.toList());
 
         accountsFinal =  accountsFinal.stream().map(account -> {
-            List<AccountSigner> signerList = account.getSigners().stream().map(signer -> {
-                signer.setCustomer(getCustomer(signer.getCustomerId()).getBody());
-                return signer;
-            }).collect(Collectors.toList());
+            List<AccountSigner> signerList = mapSigners(account);
             account.setSigners(signerList);
             return account;
         }).collect(Collectors.toList());
@@ -76,9 +70,17 @@ public class AccountController {
     //delete
 
 
-    //mapping Customers
-//    public List<Customer> mapCustomers (List<Entity> customers){
-//
-//        return
-//    };
+    public List<AccountOwner> mapOwners(Account account) {
+        return account.getOwners().stream().map(owner -> {
+            owner.setCustomer(getCustomer(owner.getCustomerId()).getBody());
+            return owner;
+        }).collect(Collectors.toList());
+    }
+
+    public List<AccountSigner> mapSigners(Account account) {
+        return account.getSigners().stream().map(signer -> {
+            signer.setCustomer(getCustomer(signer.getCustomerId()).getBody());
+            return signer;
+        }).collect(Collectors.toList());
+    }
 }
