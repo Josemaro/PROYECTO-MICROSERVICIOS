@@ -38,7 +38,17 @@ public class AccountController {
     public ResponseEntity<List<Account>> listAllCustomers(@RequestParam(name = "type", required = false) Long typeId) {
         List<Account> accounts = new ArrayList<>();
         accounts = accountService.findAllAccounts();
-        return ResponseEntity.ok(accounts);
+
+        List<Account> accountsFinal =  accounts.stream().map(account -> {
+            List<AccountOwner> ownerList = account.getOwners().stream().map(owner -> {
+                owner.setCustomer(getCustomer(owner.getCustomerId()).getBody());
+                return owner;
+            }).collect(Collectors.toList());
+            account.setOwners(ownerList);
+            return account;
+        }).collect(Collectors.toList());
+        
+        return ResponseEntity.ok(accountsFinal);
     }
     //put
     //post
