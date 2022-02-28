@@ -5,6 +5,7 @@ import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.repository.AccountRepository;
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
+import com.nttdata.proyect.accounts.repository.entities.AccountSigner;
 import com.nttdata.proyect.accounts.repository.entities.AccountType;
 import com.nttdata.proyect.accounts.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class AccountController {
 
     //get
     @GetMapping
-    public ResponseEntity<List<Account>> listAllCustomers(@RequestParam(name = "type", required = false) Long typeId) {
+    public ResponseEntity<List<Account>> listAllAccounts(@RequestParam(name = "type", required = false) Long typeId) {
         List<Account> accounts = new ArrayList<>();
         accounts = accountService.findAllAccounts();
 
@@ -47,8 +48,28 @@ public class AccountController {
             account.setOwners(ownerList);
             return account;
         }).collect(Collectors.toList());
-        
+
+        accountsFinal =  accountsFinal.stream().map(account -> {
+            List<AccountSigner> signerList = account.getSigners().stream().map(signer -> {
+                signer.setCustomer(getCustomer(signer.getCustomerId()).getBody());
+                return signer;
+            }).collect(Collectors.toList());
+            account.setSigners(signerList);
+            return account;
+        }).collect(Collectors.toList());
+
         return ResponseEntity.ok(accountsFinal);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Account> getAccount(@PathVariable("id") Long id) {
+        log.info("Fetching Customer with id {}", id);
+        Account account = accountService.getAccount(id);
+        if (null == account) {
+            log.error("Customer with id {} not found.", id);
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(account);
     }
     //put
     //post

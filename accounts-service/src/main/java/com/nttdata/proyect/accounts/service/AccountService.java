@@ -11,11 +11,11 @@ public interface AccountService {
 
     List<Account> findAccountsByType(AccountType type);
 
-    Account createAccount(Account customer);
+    Account createAccount(Account account);
 
-    Account updateAccount(Account customer);
+    Account updateAccount(Account account);
 
-    Account deleteAccount(Account customer);
+    Account deleteAccount(Account account);
 
     Account getAccount(Long id);
 

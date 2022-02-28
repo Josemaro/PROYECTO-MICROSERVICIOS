@@ -23,9 +23,6 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
-    CustomerClient customerClient;
-
-    @Autowired
     AccountRepository accountRepository;
 
     @Autowired
@@ -64,12 +61,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account updateAccount(Account customer) {
+    public Account updateAccount(Account account) {
         return null;
     }
 
     @Override
-    public Account deleteAccount(Account customer) {
+    public Account deleteAccount(Account account) {
         return null;
     }
 

@@ -40,7 +40,6 @@ public class Account implements Serializable{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account",cascade = CascadeType.ALL)
     private List<AccountOwner> owners;
 
-    @JsonIgnore
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account",cascade = CascadeType.ALL)
@@ -51,10 +50,9 @@ public class Account implements Serializable{
     @Column(name="movements_limit")
     private Integer movementsLimit;
 
-    @JsonIgnore
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account",cascade = CascadeType.ALL)
     private List<Movement> movements;
 
 
