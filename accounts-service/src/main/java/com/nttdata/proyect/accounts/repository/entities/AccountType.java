@@ -12,6 +12,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "tbl_account_types")
 public class AccountType implements Serializable{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

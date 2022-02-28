@@ -9,7 +9,9 @@ import javax.persistence.*;
 @Data
 @Table(name = "tbl_movements")
 public class Movement {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
