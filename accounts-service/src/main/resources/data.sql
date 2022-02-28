@@ -10,5 +10,8 @@ INSERT INTO tbl_accounts (id, account_number, balance, commission, movements_lim
 --INSERT INTO tbl_accounts (id, account_number,account_type_id ) VALUES (1, '1234222233334444', 1);
 
 
-INSERT INTO tbl_account_owner (id, customer_id, account_id) values (1,1,1);
-INSERT INTO tbl_account_owner (id, customer_id, account_id) values (2,2,2);
+INSERT INTO tbl_account_owners (id, customer_id, account_id) values (1,1,1);
+INSERT INTO tbl_account_owners (id, customer_id, account_id) values (2,2,2);
+INSERT INTO tbl_account_owners (id, customer_id, account_id) values (3,1,2);
+
+INSERT INTO tbl_account_signers (id, customer_id, account_id) values (1,1,2);

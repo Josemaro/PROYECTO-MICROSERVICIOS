@@ -9,14 +9,14 @@ import javax.persistence.*;
 
 @Entity
 @Data
-@Table(name = "tbl_account_owner")
+@Table(name = "tbl_account_owners")
 public class AccountOwner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Account account;

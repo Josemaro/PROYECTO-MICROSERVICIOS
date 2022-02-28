@@ -1,6 +1,5 @@
 package com.nttdata.proyect.accounts.service.implementation;
 
-import com.nttdata.proyect.accounts.client.CustomerClient;
 import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.repository.AccountOwnerRepository;
 import com.nttdata.proyect.accounts.repository.AccountRepository;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,17 +44,19 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account createAccount(Account account) {
+    public Account createAccount(Account account, Customer customer) {
 
-        Account accountDB = accountRepository.getById(account.getId());
 
-        if (accountDB.getId() == null) {
-            return accountDB;
-        }
+        List<AccountOwner> owners = new ArrayList<>();
+        AccountOwner owner = new AccountOwner();
+        owner.setCustomerId(customer.getId());
+        owner.setCustomer(customer);
+        owners.add(owner);
+        account.setOwners(owners);
 
-//        account.setState("CREATED");
-        accountDB = accountRepository.save(account);
-        return accountDB;
+        Account accountDB = accountRepository.save(account);
+
+        return getAccount(accountDB.getId());
 
     }
 

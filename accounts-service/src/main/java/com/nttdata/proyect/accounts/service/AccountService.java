@@ -1,5 +1,6 @@
 package com.nttdata.proyect.accounts.service;
 
+import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import com.nttdata.proyect.accounts.repository.entities.AccountType;
 
@@ -11,7 +12,7 @@ public interface AccountService {
 
     List<Account> findAccountsByType(AccountType type);
 
-    Account createAccount(Account account);
+    Account createAccount(Account account, Customer customer );
 
     Account updateAccount(Account account);
 

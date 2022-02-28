@@ -2,6 +2,7 @@ package com.nttdata.proyect.accounts.controller;
 
 import com.nttdata.proyect.accounts.client.CustomerClient;
 import com.nttdata.proyect.accounts.models.Customer;
+import com.nttdata.proyect.accounts.models.RegistrationRequestBody;
 import com.nttdata.proyect.accounts.repository.AccountRepository;
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
@@ -10,9 +11,9 @@ import com.nttdata.proyect.accounts.repository.entities.AccountType;
 import com.nttdata.proyect.accounts.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,10 +64,27 @@ public class AccountController {
             log.error("Customer with id {} not found.", id);
             return ResponseEntity.notFound().build();
         }
+        account.setOwners(mapOwners(account));
+        account.setSigners(mapSigners(account));
         return ResponseEntity.ok(account);
     }
     //put
     //post
+    // -------------------Create a Account-------------------------------------------
+
+    @PostMapping(value = "/register")
+    public ResponseEntity<Account> createCustomer(@RequestBody RegistrationRequestBody registrationRequestBody) {
+        log.info("Creating Account....");
+        String customerDni = registrationRequestBody.getCustomerDni();
+        Customer customerDB = customerClient.getCustomerByDni(customerDni).getBody();
+        if(customerDB==null){
+            log.info("CustomerNotFound By Dni");
+            return ResponseEntity.notFound().build();
+        };
+        Account newAccount = registrationRequestBody.getAccount();
+        Account accountDB = accountService.createAccount(newAccount,customerDB);
+        return ResponseEntity.ok(accountDB);
+    }
     //delete
 
 

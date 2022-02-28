@@ -28,7 +28,7 @@ public class Account implements Serializable{
     @Column(name="balance")
     private Double balance;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_type_id", referencedColumnName = "id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private AccountType type;
