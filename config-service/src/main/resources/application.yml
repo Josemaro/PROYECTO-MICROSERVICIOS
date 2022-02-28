@@ -6,11 +6,9 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/Josemaro/PROYECTO-MICROSERVICIOS
+          uri: D:\REPOSITORIOS\PROYECTO\PROYECTO-MICROSERVICIOS\
           searchPaths: config-data
-          username: ${GIT_USER}
-          password: ${GIT_PASSWORD}
   security:
     user:
       name: root
-      password: s3cr3t
+      password: password
