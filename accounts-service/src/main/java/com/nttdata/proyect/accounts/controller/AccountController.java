@@ -54,29 +54,26 @@ public class AccountController {
             return account;
         }).collect(Collectors.toList());
 
-//        if(typeId!=null){
-//            List<Account> accountsFilteredByType = accountsFinal.stream().map(account -> {
-//               if(Objects.equals(account.getType().getId(), typeId)){
-//                   return account;
-//               }else {
-//                   return null;
-//               }
-//            }).collect(Collectors.toList());
-//        }
-
         return ResponseEntity.ok(accountsFinal);
     }
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Account> getAccount(@PathVariable("id") Long id) {
-        log.info("Fetching Customer with id {}", id);
+        log.info("Fetching Account with id {}", id);
         Account account = accountService.getAccount(id);
         if (null == account) {
-            log.error("Customer with id {} not found.", id);
+            log.error("Account with id {} not found.", id);
             return ResponseEntity.notFound().build();
         }
+
         account.setOwners(mapOwners(account));
         account.setSigners(mapSigners(account));
+
+        account.getOwners().stream().map(accountOwner -> {
+            log.info("{}",accountOwner.getCustomerId());
+            return accountOwner.getCustomerId();
+
+        }).collect(Collectors.toList());
         return ResponseEntity.ok(account);
     }
     //put
@@ -96,7 +93,8 @@ public class AccountController {
         Account accountDB = accountService.createAccount(newAccount,customerDB);
         return ResponseEntity.ok(accountDB);
     }
-    //delete
+
+    // -------------------Map Functions----------------------------------------------
 
 
     public List<AccountOwner> mapOwners(Account account) {

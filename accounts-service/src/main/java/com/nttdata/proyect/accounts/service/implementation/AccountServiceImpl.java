@@ -1,10 +1,7 @@
 package com.nttdata.proyect.accounts.service.implementation;
 
 import com.nttdata.proyect.accounts.models.Customer;
-import com.nttdata.proyect.accounts.repository.AccountOwnerRepository;
-import com.nttdata.proyect.accounts.repository.AccountRepository;
-import com.nttdata.proyect.accounts.repository.AccountSignerRepository;
-import com.nttdata.proyect.accounts.repository.MovementRepository;
+import com.nttdata.proyect.accounts.repository.*;
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
 import com.nttdata.proyect.accounts.repository.entities.AccountType;
@@ -30,6 +27,10 @@ public class AccountServiceImpl implements AccountService {
     AccountSignerRepository accountSignerRepository;
 
     @Autowired
+    AccountTypeRepository accountTypeRepository;
+
+
+    @Autowired
     MovementRepository movementRepository;
 
 
@@ -53,6 +54,7 @@ public class AccountServiceImpl implements AccountService {
         owner.setCustomer(customer);
         owners.add(owner);
         account.setOwners(owners);
+
 
         Account accountDB = accountRepository.save(account);
         owner.setAccount(accountDB);
