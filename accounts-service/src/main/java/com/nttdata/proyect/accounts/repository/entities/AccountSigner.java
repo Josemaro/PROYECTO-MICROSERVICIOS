@@ -14,7 +14,7 @@ public class AccountSigner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Account account;

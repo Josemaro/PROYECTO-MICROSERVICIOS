@@ -1,21 +1,29 @@
 package com.nttdata.proyect.accounts.service.implementation;
 
+import com.nttdata.proyect.accounts.client.CustomerClient;
+import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.repository.AccountOwnerRepository;
 import com.nttdata.proyect.accounts.repository.AccountRepository;
 import com.nttdata.proyect.accounts.repository.AccountSignerRepository;
 import com.nttdata.proyect.accounts.repository.MovementRepository;
 import com.nttdata.proyect.accounts.repository.entities.Account;
+import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
 import com.nttdata.proyect.accounts.repository.entities.AccountType;
 import com.nttdata.proyect.accounts.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class AccountServiceImpl implements AccountService {
+
+    @Autowired
+    CustomerClient customerClient;
 
     @Autowired
     AccountRepository accountRepository;
@@ -32,7 +40,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> findAllAccounts() {
-        return accountRepository.findAll();
+        return  accountRepository.findAll();
     }
 
     @Override
@@ -49,7 +57,7 @@ public class AccountServiceImpl implements AccountService {
             return accountDB;
         }
 
-        account.setState("CREATED");
+//        account.setState("CREATED");
         accountDB = accountRepository.save(account);
         return accountDB;
 

@@ -1,5 +1,6 @@
 package com.nttdata.proyect.accounts.repository.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nttdata.proyect.accounts.models.Customer;
 import lombok.Data;
@@ -14,7 +15,8 @@ public class AccountOwner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "account_id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Account account;

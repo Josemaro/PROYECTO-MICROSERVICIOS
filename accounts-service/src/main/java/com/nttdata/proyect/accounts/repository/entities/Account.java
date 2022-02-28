@@ -1,5 +1,6 @@
 package com.nttdata.proyect.accounts.repository.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,8 +28,8 @@ public class Account implements Serializable{
     @Column(name="balance")
     private Double balance;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "type_id")
+    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "account_type_id", referencedColumnName = "id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private AccountType type;
 
@@ -36,12 +37,13 @@ public class Account implements Serializable{
 
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account",cascade = CascadeType.ALL)
     private List<AccountOwner> owners;
 
+    @JsonIgnore
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account",cascade = CascadeType.ALL)
     private List<AccountSigner> signers;
 
     private Double commission;
@@ -49,6 +51,7 @@ public class Account implements Serializable{
     @Column(name="movements_limit")
     private Integer movementsLimit;
 
+    @JsonIgnore
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
