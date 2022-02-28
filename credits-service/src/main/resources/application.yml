@@ -1,12 +1,12 @@
 #Application Configuration
 server:
-  port: 9091
+  port: 9093
 # To See H2 Console in Browser:
 # http://localhost:8092/h2-console
 # Enabling H2 Console
 spring:
   application:
-    name: customer-service
+    name: credits-service
   h2:
     console:
       enabled: true
@@ -42,4 +42,4 @@ eureka:
 
 springdoc:
   swagger-ui:
-    path: /customers/swagger-ui.html
+    path: /credits/swagger-ui.html

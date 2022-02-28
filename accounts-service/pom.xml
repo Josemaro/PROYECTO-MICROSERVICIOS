@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.nttdata.proyect</groupId>
-	<artifactId>bank-products-service</artifactId>
+	<artifactId>accounts-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>bank-products-service</name>
-	<description>bank-products-service</description>
+	<name>accounts-service</name>
+	<description>accounts-service</description>
 	<properties>
 		<java.version>11</java.version>
 		<spring-cloud.version>2021.0.1</spring-cloud.version>
@@ -56,6 +56,7 @@
 			<version>1.6.6</version>
 		</dependency>
 	</dependencies>
+
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
