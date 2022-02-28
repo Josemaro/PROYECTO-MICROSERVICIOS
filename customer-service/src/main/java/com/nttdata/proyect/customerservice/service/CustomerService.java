@@ -19,4 +19,6 @@ public interface CustomerService {
 
     Customer getCustomer(Long id);
 
+    Customer getCustomerByNumberID(String numberID);
+
 }

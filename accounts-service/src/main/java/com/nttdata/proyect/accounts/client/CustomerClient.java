@@ -12,4 +12,6 @@ public interface CustomerClient {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id);
+
+
 }
