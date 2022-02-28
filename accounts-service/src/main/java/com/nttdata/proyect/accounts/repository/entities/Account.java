@@ -16,12 +16,16 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "tbl_accounts")
 public class Account implements Serializable{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "account_number", unique = true, nullable = false)
     private String accountNumber;
+
+    @Column(name="balance")
+    private Double balance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
@@ -38,6 +42,17 @@ public class Account implements Serializable{
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
-    private List<AccountSigners> signers;
+    private List<AccountSigner> signers;
+
+    private Double commission;
+
+    @Column(name="movements_limit")
+    private Integer movementsLimit;
+
+    @Valid
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "account")
+    private List<Movement> movements;
+
 
 }

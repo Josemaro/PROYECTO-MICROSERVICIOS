@@ -1,23 +1,27 @@
 package com.nttdata.proyect.accounts.repository.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
+import com.nttdata.proyect.accounts.models.Customer;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Data
 @Entity
-@Table(name = "tbl_account_types")
-public class BankingMovement {
+@Data
+@Table(name = "tbl_account_signers")
+public class AccountSigner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "movement_type_id")
+    @JoinColumn(name = "account_id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-    private MovementType movementType;
+    private Account account;
+
+    @Column(name = "customer_id")
+    private Long customerId;
+
+    @Transient
+    private Customer customer;
 }
