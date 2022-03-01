@@ -11,7 +11,7 @@ public interface AccountService {
 
     List<Account> findAccountsByType(AccountType type);
 
-    Account createAccount(Account account,AccountType accountType, Customer customer );
+    Account createAccount(String accountNumber,Double initialBalance,AccountType accountType, Customer customer );
 
     Account updateAccount(Account account);
 

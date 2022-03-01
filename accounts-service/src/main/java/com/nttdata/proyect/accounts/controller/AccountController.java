@@ -98,25 +98,37 @@ public class AccountController {
             log.info("AccountType Not Found");
             return ResponseEntity.notFound().build();
         }
-        // A business customer can't have a fix-term account or savings account
+        //---------------------- A business customer can't have a fix-term account or savings account-------------------
+        /*Un cliente empresarial no puede tener una cuenta de ahorro o de plazo fijo, pero sí
+         *múltiples cuentas corrientes.
+         */
         if (customerDB.getCategory().getId() == 2 && (accountType.getId() == 1 || accountType.getId() == 3)) {
             log.info("A business customer can't have a fix-term account or savings account");
             return ResponseEntity.badRequest().build();
         }
-        // A personal customer only can have one account
+        // ----------------------A personal customer only can have one account------------------------------------------
+        /*
+         *  Un cliente personal solo puede tener un máximo de una cuenta de ahorro, una cuenta
+         *  corriente o cuentas a plazo fijo
+         */
         int numberOfAccounts = accountService.getOwnedAccountsByCustomerId(customerDB.getId());
         if (customerDB.getCategory().getId() == 1 && numberOfAccounts >= 1) {
             log.info("A personal customer only can have one account ");
             return ResponseEntity.badRequest().build();
         }
 
-        Account newAccount = registrationRequestBody.getAccount();
-        Account accountDB = accountService.createAccount(newAccount, accountType, customerDB);
+        Double initialBalance = registrationRequestBody.getBalance();
+        String accountNumber = registrationRequestBody.getAccountNumber();
+
+        Account accountDB = accountService.createAccount(accountNumber,initialBalance, accountType, customerDB);
         return ResponseEntity.ok(accountDB);
     }
 
-    // -------------------Add Owners and Signers-------------------------------------------
-
+    // -------------------Add Owners and Signers------------------------------------------------------------------------
+    /*
+     *  Las cuentas bancarias empresariales pueden tener uno o más titulares y cero o más
+     *  firmantes autorizados.
+     */
     @PostMapping(value = "/addOwner")
     public ResponseEntity<Account> addOwner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
         Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();

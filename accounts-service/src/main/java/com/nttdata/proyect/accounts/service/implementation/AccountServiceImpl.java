@@ -51,18 +51,41 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Account createAccount(Account account, AccountType accountType, Customer customer) {
-
+    public Account createAccount(String accountNumber,Double initialBalance, AccountType accountType, Customer customer) {
         List<AccountOwner> owners = new ArrayList<>();
         AccountOwner owner = new AccountOwner();
         owner.setCustomerId(customer.getId());
         owner.setCustomer(customer);
         owners.add(owner);
-        account.setOwners(owners);
+        int accountTypeId = Integer.parseInt(accountType.getId().toString());
+        double commission = 0D;
+        int movementsLimit = 0;
+        switch (accountTypeId)
+        {
+            case 1:
+                commission = 0D;
+                movementsLimit = 30;
+                break;
+            case 2:
+                commission = 10D;
+                movementsLimit = Integer.MAX_VALUE;
+                break;
+            case 3:
+                commission = 0D;
+                movementsLimit = 1;
+                break;
+        }
+        Account account = new Account();
+        account.setAccountNumber(accountNumber);
+        account.setBalance(initialBalance);
+        account.setCommission(commission);
+        account.setMovementsLimit(movementsLimit);
+        account.prePersist();
         account.setType(accountType);
         Account accountDB = accountRepository.save(account);
         owner.setAccount(accountDB);
         accountOwnerRepository.save(owner);
+
         return getAccount(accountDB.getId());
     }
 

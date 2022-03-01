@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class RegistrationRequestBody {
     private String customerDni;
-    private Account account;
+    private Double balance;
+    private String accountNumber;
     private Long accountTypeId;
 }

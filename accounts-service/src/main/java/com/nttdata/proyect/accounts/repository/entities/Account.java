@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -47,13 +48,23 @@ public class Account implements Serializable{
 
     private Double commission;
 
+    @Column(name = "create_at")
+    @Temporal(TemporalType.DATE)
+    private Date createAt;
+
     @Column(name="movements_limit")
-    private Integer movementsLimit;
+    private int movementsLimit;
 
     @Valid
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "account",cascade = CascadeType.ALL)
     private List<Movement> movements;
+
+    @PrePersist
+    public void prePersist() {
+        this.createAt = new Date();
+        this.state = "CREATED";
+    }
 
 
 }
