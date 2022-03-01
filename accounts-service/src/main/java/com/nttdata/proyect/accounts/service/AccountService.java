@@ -45,6 +45,6 @@ public interface AccountService {
     Movement saveMovement(Account account, MovementType type, Double amount);
 
 
-    //----------------------BUSINESS VALIDATION---------------------------------------------
-
+    //----------------------CALCULATIONS---------------------------------------------
+    double calcFinalBalance(Double initialBalance, int typeId, Double amount);
 }

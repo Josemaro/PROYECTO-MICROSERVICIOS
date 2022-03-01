@@ -6,5 +6,4 @@ import lombok.Data;
 public class MovementRequestBody {
     Double amount;
     Long typeId;
-    Long accountId;
 }

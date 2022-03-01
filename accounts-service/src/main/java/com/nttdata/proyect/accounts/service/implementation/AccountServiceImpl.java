@@ -197,32 +197,34 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Movement saveMovement(Account account, MovementType type, Double amount) {
+        int typeId = Integer.parseInt(type.getId().toString());
+        if(account.getBalance()<amount && typeId == 1){
+            return null;
+        }
+
         Movement movement = new Movement();
         movement.setAccount(account);
         movement.setType(type);
         movement.setAmount(amount);
+        movement.prePersist();
 
-        Double balance = account.getBalance();
-        Double commision = account.getCommission();
-
-        //1 retiro 2 depostio
-        if (type.getId() == 1) {
-            //BALANCE O TOTAL TIENE QUE SER MAYOR A LA SUMA DE MI RETIRO
-            if (balance >= amount + commision) {
-                account.setBalance(account.getBalance() - (amount + commision));
-            } else {
-                return null;
-            }
-        } else if (type.getId() == 2) {
-            //COMISION - BALANCE <= MONTO A DEPOSITAR
-            if (amount >= (commision - balance)) {
-                account.setBalance(account.getBalance() + (amount - commision));
-            } else {
-                return null;
-            }
-        }
-        updateAccount(account);
         return movementRepository.save(movement);
+    }
+
+    public double calcFinalBalance(Double initialBalance, int typeId, Double amount){
+        double finalBalance = 0D;
+        if (typeId == 1) {
+            if (initialBalance >= amount) {
+                //--------------------------WITHDRAW = RETIRO-------------------------------------------
+                finalBalance = (initialBalance- (amount));
+            } else {
+                return 0D;
+            }
+        } else if (typeId == 2) {
+            //-------------------------DEPOSIT = DEPOSITO--------------------------------------------
+            finalBalance = initialBalance + (amount);
+        }
+        return finalBalance;
     }
 
 }

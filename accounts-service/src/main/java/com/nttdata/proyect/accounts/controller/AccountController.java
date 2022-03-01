@@ -1,6 +1,7 @@
 package com.nttdata.proyect.accounts.controller;
 
 import com.nttdata.proyect.accounts.client.CustomerClient;
+import com.nttdata.proyect.accounts.exception.AccountException;
 import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.models.requestBody.AddOwnerSignerBody;
 import com.nttdata.proyect.accounts.models.requestBody.MovementRequestBody;
@@ -47,12 +48,14 @@ public class AccountController {
         List<Account> accounts = new ArrayList<>();
         accounts = accountService.findAllAccounts();
 
+        log.info("mapping owners stream function");
         List<Account> accountsFinal = accounts.stream().map(account -> {
             List<AccountOwner> ownerList = accountService.mapOwners(account);
             account.setOwners(ownerList);
             return account;
         }).collect(Collectors.toList());
 
+        log.info("mapping owners mapping signers");
         accountsFinal = accountsFinal.stream().map(account -> {
             List<AccountSigner> signerList = accountService.mapSigners(account);
             account.setSigners(signerList);
@@ -89,13 +92,13 @@ public class AccountController {
 
 
         if (customerDB == null) {
-            log.info("Customer Not Found");
+            log.info("CUSTOMER NOT FOUND!!!!!!!");
             return ResponseEntity.notFound().build();
         }
 
         AccountType accountType = accountService.getAccountType(registrationRequestBody.getAccountTypeId());
         if (accountType == null) {
-            log.info("AccountType Not Found");
+            log.info("ACCOUNT TYPE NOT FOUND!!!!!!!");
             return ResponseEntity.notFound().build();
         }
         //---------------------- A business customer can't have a fix-term account or savings account-------------------
@@ -103,7 +106,7 @@ public class AccountController {
          *múltiples cuentas corrientes.
          */
         if (customerDB.getCategory().getId() == 2 && (accountType.getId() == 1 || accountType.getId() == 3)) {
-            log.info("A business customer can't have a fix-term account or savings account");
+            log.info("A BUSINESS CUSTOMER CAN'T HAVE A FIX-TERM ACCOUNT OR SAVINGS ACCOUNT");
             return ResponseEntity.badRequest().build();
         }
         // ----------------------A personal customer only can have one account------------------------------------------
@@ -113,7 +116,7 @@ public class AccountController {
          */
         int numberOfAccounts = accountService.getOwnedAccountsByCustomerId(customerDB.getId());
         if (customerDB.getCategory().getId() == 1 && numberOfAccounts >= 1) {
-            log.info("A personal customer only can have one account ");
+            log.info("A PERSONAL CUSTOMER ONLY CAN HAVE ONE ACCOUNT ");
             return ResponseEntity.badRequest().build();
         }
 
@@ -131,6 +134,7 @@ public class AccountController {
      */
     @PostMapping(value = "/addOwner")
     public ResponseEntity<Account> addOwner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
+        log.info("IN ADD OWNER FUNCTION");
         Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();
         Account account = getAccount(addOwnerSignerBody.getAccountId()).getBody();
         Account accountDB = accountService.addOwner(account,customer);
@@ -139,6 +143,7 @@ public class AccountController {
 
     @PostMapping(value = "/addSigner")
     public ResponseEntity<Account> addSigner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
+        log.info("IN ADD SIGNER FUNCTION");
         Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();
         Account account = getAccount(addOwnerSignerBody.getAccountId()).getBody();
         Account accountDB = accountService.addSigner(account,customer);
@@ -148,11 +153,28 @@ public class AccountController {
     // -------------------MOVEMENTS------------------------------------------
 
     @PostMapping(value = "/movement/{accountId}")
-    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
-        Account account = getAccount(movementRequestBody.getAccountId()).getBody();
+    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody) throws AccountException {
+        log.info("MAKING A MOVEMENT");
+        Account account = getAccount(accountId).getBody();
         MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
         Double amount = movementRequestBody.getAmount();
         Movement movement = accountService.saveMovement(account,type,amount);
+
+        if(movement==null){
+//          throw new AccountException("xd");
+            log.info("INVALID MOVEMENT REQUEST");
+            return  ResponseEntity.badRequest().build();
+        };
+
+        int typeId = Integer.parseInt(type.getId().toString());
+        double balance = account.getBalance();
+        Double finalBalance = accountService.calcFinalBalance(balance,typeId, movement.getAmount());
+        account.setBalance(finalBalance);
+        Account accountDB =  accountService.updateAccount(account);
+        if(accountDB == null){
+            log.info("CAN'T UPDATE ACCOUNT");
+            return  ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok().body(movement);
     }
 
@@ -161,5 +183,7 @@ public class AccountController {
         Double balance = accountService.getBalanceByAccount(id);
         return ResponseEntity.ok().body(balance);
     }
+
+
 
 }

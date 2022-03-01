@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Data
@@ -24,8 +25,18 @@ public class Movement {
     @Column(name="amount")
     private Double amount;
 
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    private Date date;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movement_type_id")
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private MovementType type;
+
+
+    @PrePersist
+    public void prePersist() {
+        this.date = new Date();
+    }
 }
