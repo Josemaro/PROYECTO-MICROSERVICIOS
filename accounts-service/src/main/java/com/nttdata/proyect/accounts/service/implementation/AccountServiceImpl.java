@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-
 @Slf4j
 @Service
 public class AccountServiceImpl implements AccountService {
@@ -43,7 +42,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> findAllAccounts() {
-        return  accountRepository.findAll();
+        return accountRepository.findAll();
     }
 
     @Override
@@ -70,7 +69,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public Account updateAccount(Account account) {
         Account accountDB = getAccount(account.getId());
-        if(accountDB == null){
+        if (accountDB == null) {
             return null;
         }
         accountDB.setState(account.getState());
@@ -144,6 +143,15 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public Double getBalanceByAccount(Long id) {
+        Account account = getAccount(id);
+        if (account == null){
+            return null;
+        }
+        return account.getBalance();
+    }
+
+    @Override
     public MovementType getMovementType(Long id) {
         return movementTypeRepository.getById(id);
     }
@@ -175,23 +183,23 @@ public class AccountServiceImpl implements AccountService {
         Double commision = account.getCommission();
 
         //1 retiro 2 depostio
-        if(type.getId()==1){
+        if (type.getId() == 1) {
             //BALANCE O TOTAL TIENE QUE SER MAYOR A LA SUMA DE MI RETIRO
-            if(balance>=amount+commision){
-                account.setBalance(account.getBalance()-(amount+commision));
-            }else{
+            if (balance >= amount + commision) {
+                account.setBalance(account.getBalance() - (amount + commision));
+            } else {
                 return null;
             }
-        }else if (type.getId()==2){
+        } else if (type.getId() == 2) {
             //COMISION - BALANCE <= MONTO A DEPOSITAR
-            if(amount>=(commision-balance)){
-                account.setBalance(account.getBalance()+(amount-commision));
-            }else {
+            if (amount >= (commision - balance)) {
+                account.setBalance(account.getBalance() + (amount - commision));
+            } else {
                 return null;
             }
         }
         updateAccount(account);
-        return  movementRepository.save(movement);
+        return movementRepository.save(movement);
     }
 
 }

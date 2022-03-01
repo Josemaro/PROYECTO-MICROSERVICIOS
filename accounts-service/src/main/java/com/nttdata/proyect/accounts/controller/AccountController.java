@@ -144,4 +144,10 @@ public class AccountController {
         return ResponseEntity.ok().body(movement);
     }
 
+    @GetMapping(value = "/{id}/balance")
+    public ResponseEntity<Double> balanceByAccountId(@RequestParam("id") Long id){
+        Double balance = accountService.getBalanceByAccount(id);
+        return ResponseEntity.ok().body(balance);
+    }
+
 }

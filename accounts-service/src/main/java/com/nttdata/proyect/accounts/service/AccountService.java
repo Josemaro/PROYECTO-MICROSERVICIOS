@@ -32,6 +32,8 @@ public interface AccountService {
 
     int getTotalMovementsByAccount(Long id);
 
+    Double getBalanceByAccount(Long id);
+
     MovementType getMovementType(Long id);
 
     //----------------------MAP FUNCTIONS----------------------------------------------
