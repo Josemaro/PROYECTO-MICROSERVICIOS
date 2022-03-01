@@ -3,10 +3,7 @@ package com.nttdata.proyect.accounts.service.implementation;
 import com.nttdata.proyect.accounts.client.CustomerClient;
 import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.repository.*;
-import com.nttdata.proyect.accounts.repository.entities.Account;
-import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
-import com.nttdata.proyect.accounts.repository.entities.AccountSigner;
-import com.nttdata.proyect.accounts.repository.entities.AccountType;
+import com.nttdata.proyect.accounts.repository.entities.*;
 import com.nttdata.proyect.accounts.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +34,11 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     AccountTypeRepository accountTypeRepository;
 
-
     @Autowired
     MovementRepository movementRepository;
+
+    @Autowired
+    MovementTypeRepository movementTypeRepository;
 
 
     @Override
@@ -139,6 +138,16 @@ public class AccountServiceImpl implements AccountService {
         return accountOwnerRepository.findByCustomerId(id).size();
     }
 
+    @Override
+    public int getTotalMovementsByAccount(Long id) {
+        return movementRepository.findByAccountId(id).size();
+    }
+
+    @Override
+    public MovementType getMovementType(Long id) {
+        return movementTypeRepository.getById(id);
+    }
+
     // -------------------Map Functions----------------------------------------------
 
     public List<AccountOwner> mapOwners(Account account) {
@@ -153,6 +162,36 @@ public class AccountServiceImpl implements AccountService {
             signer.setCustomer(customerClient.getCustomer(signer.getCustomerId()).getBody());
             return signer;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Movement saveMovement(Account account, MovementType type, Double amount) {
+        Movement movement = new Movement();
+        movement.setAccount(account);
+        movement.setType(type);
+        movement.setAmount(amount);
+
+        Double balance = account.getBalance();
+        Double commision = account.getCommission();
+
+        //1 retiro 2 depostio
+        if(type.getId()==1){
+            //BALANCE O TOTAL TIENE QUE SER MAYOR A LA SUMA DE MI RETIRO
+            if(balance>=amount+commision){
+                account.setBalance(account.getBalance()-(amount+commision));
+            }else{
+                return null;
+            }
+        }else if (type.getId()==2){
+            //COMISION - BALANCE <= MONTO A DEPOSITAR
+            if(amount>=(commision-balance)){
+                account.setBalance(account.getBalance()+(amount-commision));
+            }else {
+                return null;
+            }
+        }
+        updateAccount(account);
+        return  movementRepository.save(movement);
     }
 
 }

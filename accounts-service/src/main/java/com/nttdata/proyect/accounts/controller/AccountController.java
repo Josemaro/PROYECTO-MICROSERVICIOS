@@ -3,11 +3,9 @@ package com.nttdata.proyect.accounts.controller;
 import com.nttdata.proyect.accounts.client.CustomerClient;
 import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.models.requestBody.AddOwnerSignerBody;
+import com.nttdata.proyect.accounts.models.requestBody.MovementRequestBody;
 import com.nttdata.proyect.accounts.models.requestBody.RegistrationRequestBody;
-import com.nttdata.proyect.accounts.repository.entities.Account;
-import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
-import com.nttdata.proyect.accounts.repository.entities.AccountSigner;
-import com.nttdata.proyect.accounts.repository.entities.AccountType;
+import com.nttdata.proyect.accounts.repository.entities.*;
 import com.nttdata.proyect.accounts.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,6 +133,15 @@ public class AccountController {
         return ResponseEntity.ok(accountDB);
     }
 
-    // -------------------Create a Account-------------------------------------------
+    // -------------------MOVEMENTS------------------------------------------
+
+    @PostMapping(value = "/movement/{accountId}")
+    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
+        Account account = getAccount(movementRequestBody.getAccountId()).getBody();
+        MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
+        Double amount = movementRequestBody.getAmount();
+        Movement movement = accountService.saveMovement(account,type,amount);
+        return ResponseEntity.ok().body(movement);
+    }
 
 }

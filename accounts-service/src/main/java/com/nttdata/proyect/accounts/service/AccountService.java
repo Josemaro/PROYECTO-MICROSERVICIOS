@@ -1,10 +1,7 @@
 package com.nttdata.proyect.accounts.service;
 
 import com.nttdata.proyect.accounts.models.Customer;
-import com.nttdata.proyect.accounts.repository.entities.Account;
-import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
-import com.nttdata.proyect.accounts.repository.entities.AccountSigner;
-import com.nttdata.proyect.accounts.repository.entities.AccountType;
+import com.nttdata.proyect.accounts.repository.entities.*;
 
 import java.util.List;
 
@@ -33,11 +30,17 @@ public interface AccountService {
 
     int getOwnedAccountsByCustomerId(Long id);
 
+    int getTotalMovementsByAccount(Long id);
+
+    MovementType getMovementType(Long id);
+
     //----------------------MAP FUNCTIONS----------------------------------------------
 
     List<AccountOwner> mapOwners(Account account);
 
     List<AccountSigner> mapSigners(Account account);
+
+    Movement saveMovement(Account account, MovementType type, Double amount);
 
 
     //----------------------BUSINESS VALIDATION---------------------------------------------

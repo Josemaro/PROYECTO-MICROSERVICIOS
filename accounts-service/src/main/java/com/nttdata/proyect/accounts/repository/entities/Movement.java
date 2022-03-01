@@ -21,7 +21,7 @@ public class Movement {
     @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private Account account;
 
-    @Column(name="movements_limit")
+    @Column(name="amount")
     private Double amount;
 
     @ManyToOne(fetch = FetchType.LAZY)
