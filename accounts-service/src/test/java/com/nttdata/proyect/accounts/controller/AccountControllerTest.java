@@ -19,5 +19,5 @@ public class AccountControllerTest
         MockitoAnnotations.openMocks(this);
     }
 
-    
+
 }

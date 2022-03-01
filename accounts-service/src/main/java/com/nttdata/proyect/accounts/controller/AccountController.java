@@ -2,7 +2,8 @@ package com.nttdata.proyect.accounts.controller;
 
 import com.nttdata.proyect.accounts.client.CustomerClient;
 import com.nttdata.proyect.accounts.models.Customer;
-import com.nttdata.proyect.accounts.models.RegistrationRequestBody;
+import com.nttdata.proyect.accounts.models.requestBody.AddOwnerSignerBody;
+import com.nttdata.proyect.accounts.models.requestBody.RegistrationRequestBody;
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
 import com.nttdata.proyect.accounts.repository.entities.AccountSigner;
@@ -46,13 +47,13 @@ public class AccountController {
         accounts = accountService.findAllAccounts();
 
         List<Account> accountsFinal = accounts.stream().map(account -> {
-            List<AccountOwner> ownerList = mapOwners(account);
+            List<AccountOwner> ownerList = accountService.mapOwners(account);
             account.setOwners(ownerList);
             return account;
         }).collect(Collectors.toList());
 
         accountsFinal = accountsFinal.stream().map(account -> {
-            List<AccountSigner> signerList = mapSigners(account);
+            List<AccountSigner> signerList = accountService.mapSigners(account);
             account.setSigners(signerList);
             return account;
         }).collect(Collectors.toList());
@@ -71,16 +72,11 @@ public class AccountController {
             return ResponseEntity.notFound().build();
         }
 
-        account.setOwners(mapOwners(account));
-        account.setSigners(mapSigners(account));
+        account.setOwners(accountService.mapOwners(account));
+        account.setSigners(accountService.mapSigners(account));
 
-        account.getOwners().stream().map(accountOwner -> {
-            log.info("{}", accountOwner.getCustomerId());
-            return accountOwner.getCustomerId();
-        }).collect(Collectors.toList());
         return ResponseEntity.ok(account);
     }
-
 
     // -------------------Create a Account-------------------------------------------
 
@@ -89,6 +85,8 @@ public class AccountController {
         log.info("Creating Account....");
         String customerDni = registrationRequestBody.getCustomerDni();
         Customer customerDB = customerClient.getCustomerByDni(customerDni).getBody();
+
+
         if (customerDB == null) {
             log.info("Customer Not Found");
             return ResponseEntity.notFound().build();
@@ -116,19 +114,33 @@ public class AccountController {
         return ResponseEntity.ok(accountDB);
     }
 
-    // -------------------Map Functions----------------------------------------------
-
-    public List<AccountOwner> mapOwners(Account account) {
-        return account.getOwners().stream().map(owner -> {
-            owner.setCustomer(getCustomer(owner.getCustomerId()).getBody());
-            return owner;
-        }).collect(Collectors.toList());
+    @PostMapping(value = "/addOwner")
+    public ResponseEntity<Account> addOwner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
+        Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();
+        Account account = getAccount(addOwnerSignerBody.getAccountId()).getBody();
+        Account accountDB = accountService.addOwner(account,customer);
+        return ResponseEntity.ok(accountDB);
     }
 
-    public List<AccountSigner> mapSigners(Account account) {
-        return account.getSigners().stream().map(signer -> {
-            signer.setCustomer(getCustomer(signer.getCustomerId()).getBody());
-            return signer;
-        }).collect(Collectors.toList());
+    @PostMapping(value = "/addSigner")
+    public ResponseEntity<Account> addSigner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
+        Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();
+        Account account = getAccount(addOwnerSignerBody.getAccountId()).getBody();
+        Account accountDB = accountService.addSigner(account,customer);
+        return ResponseEntity.ok(accountDB);
     }
+    // -------------------Add owners -------------------------------------------
+//    @PostMapping("/addOwners/{accountId}")
+//    public ResponseEntity<Account> addOwners(@PathVariable("accountId") Long accountId, @RequestBody Long customerId){
+//        Customer customer = customerClient.getCustomer(customerId).getBody();
+//        Account accountDB = accountService.addOwner(accountId,customer);
+//        return ResponseEntity.ok().body(accountDB);
+//    }
+    // -------------------Add signers -------------------------------------------
+//    @PostMapping("/addSigners/{accountId}")
+//    public ResponseEntity<Account> addSigners(@PathVariable("accountId") Long accountId, @RequestBody Long customerId){
+//        Customer customer = customerClient.getCustomer(customerId).getBody();
+//        Account accountDB = accountService.addSigner(accountId,customer);
+//        return ResponseEntity.ok().body(accountDB);
+//    }
 }

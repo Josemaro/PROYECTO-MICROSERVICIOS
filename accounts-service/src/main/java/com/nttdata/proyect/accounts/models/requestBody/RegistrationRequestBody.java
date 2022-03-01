@@ -1,4 +1,4 @@
-package com.nttdata.proyect.accounts.models;
+package com.nttdata.proyect.accounts.models.requestBody;
 
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import lombok.Data;
