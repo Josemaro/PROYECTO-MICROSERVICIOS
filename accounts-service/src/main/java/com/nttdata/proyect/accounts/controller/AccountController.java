@@ -29,6 +29,9 @@ public class AccountController {
     @Autowired
     AccountService accountService;
 
+    // -------------------Retrieve Customer by Id or Dni-------------------------------------------
+
+
     @GetMapping(value = "/getCustomer/{id}")
     public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id) {
         return customerClient.getCustomer(id);
@@ -114,6 +117,8 @@ public class AccountController {
         return ResponseEntity.ok(accountDB);
     }
 
+    // -------------------Add Owners and Signers-------------------------------------------
+
     @PostMapping(value = "/addOwner")
     public ResponseEntity<Account> addOwner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
         Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();
@@ -129,18 +134,7 @@ public class AccountController {
         Account accountDB = accountService.addSigner(account,customer);
         return ResponseEntity.ok(accountDB);
     }
-    // -------------------Add owners -------------------------------------------
-//    @PostMapping("/addOwners/{accountId}")
-//    public ResponseEntity<Account> addOwners(@PathVariable("accountId") Long accountId, @RequestBody Long customerId){
-//        Customer customer = customerClient.getCustomer(customerId).getBody();
-//        Account accountDB = accountService.addOwner(accountId,customer);
-//        return ResponseEntity.ok().body(accountDB);
-//    }
-    // -------------------Add signers -------------------------------------------
-//    @PostMapping("/addSigners/{accountId}")
-//    public ResponseEntity<Account> addSigners(@PathVariable("accountId") Long accountId, @RequestBody Long customerId){
-//        Customer customer = customerClient.getCustomer(customerId).getBody();
-//        Account accountDB = accountService.addSigner(accountId,customer);
-//        return ResponseEntity.ok().body(accountDB);
-//    }
+
+    // -------------------Create a Account-------------------------------------------
+
 }
