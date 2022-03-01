@@ -3,7 +3,6 @@ package com.nttdata.proyect.accounts.controller;
 import com.nttdata.proyect.accounts.client.CustomerClient;
 import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.models.RegistrationRequestBody;
-import com.nttdata.proyect.accounts.repository.AccountRepository;
 import com.nttdata.proyect.accounts.repository.entities.Account;
 import com.nttdata.proyect.accounts.repository.entities.AccountOwner;
 import com.nttdata.proyect.accounts.repository.entities.AccountSigner;
@@ -11,14 +10,11 @@ import com.nttdata.proyect.accounts.repository.entities.AccountType;
 import com.nttdata.proyect.accounts.service.AccountService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,7 +38,8 @@ public class AccountController {
         return accountService.getOwnedAccountsByCustomerId(id);
     }
 
-    //get
+    // -------------------Retrieve all the accounts-------------------------------------------
+
     @GetMapping
     public ResponseEntity<List<Account>> listAllAccounts(@RequestParam(name = "type", required = false) Long typeId) {
         List<Account> accounts = new ArrayList<>();
@@ -63,6 +60,8 @@ public class AccountController {
         return ResponseEntity.ok(accountsFinal);
     }
 
+    // -------------------Retrieve an Account-------------------------------------------
+
     @GetMapping(value = "/{id}")
     public ResponseEntity<Account> getAccount(@PathVariable("id") Long id) {
         log.info("Fetching Account with id {}", id);
@@ -78,12 +77,11 @@ public class AccountController {
         account.getOwners().stream().map(accountOwner -> {
             log.info("{}", accountOwner.getCustomerId());
             return accountOwner.getCustomerId();
-
         }).collect(Collectors.toList());
         return ResponseEntity.ok(account);
     }
-    //put
-    //post
+
+
     // -------------------Create a Account-------------------------------------------
 
     @PostMapping(value = "/register")
@@ -95,14 +93,14 @@ public class AccountController {
             log.info("Customer Not Found");
             return ResponseEntity.notFound().build();
         }
-        ;
+
         AccountType accountType = accountService.getAccountType(registrationRequestBody.getAccountTypeId());
         if (accountType == null) {
             log.info("AccountType Not Found");
             return ResponseEntity.notFound().build();
         }
         // A business customer can't have a fix-term account or savings account
-        if (customerDB.getCategory().getId() == 2 && (accountType.getId()==1 || accountType.getId()==3)) {
+        if (customerDB.getCategory().getId() == 2 && (accountType.getId() == 1 || accountType.getId() == 3)) {
             log.info("A business customer can't have a fix-term account or savings account");
             return ResponseEntity.badRequest().build();
         }
@@ -119,7 +117,6 @@ public class AccountController {
     }
 
     // -------------------Map Functions----------------------------------------------
-
 
     public List<AccountOwner> mapOwners(Account account) {
         return account.getOwners().stream().map(owner -> {
