@@ -21,3 +21,5 @@ INSERT INTO tbl_account_owners (customer_id, account_id) values (5,5);
 
 INSERT INTO tbl_account_signers (customer_id, account_id) values (4,5);
 INSERT INTO tbl_account_signers (customer_id, account_id) values (5,5);
+
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (100,'2022-02-01',1,1)

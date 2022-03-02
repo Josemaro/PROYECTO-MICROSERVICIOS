@@ -25,7 +25,7 @@ public class Movement {
     @Column(name="amount")
     private Double amount;
 
-    @Column(name = "date")
+    @Column(name = "movement_date")
     @Temporal(TemporalType.DATE)
     private Date date;
 
