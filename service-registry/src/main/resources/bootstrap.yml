@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: service-registry
+  cloud:
+    config:
+      uri: http://localhost:8081/
+      username: root
+      password: password
+#server:
+#  port: 8761
+#
+#eureka:
+#  instance:
+#    hostname: localhost
+#  client:
+#    register-with-eureka: false
+#    fetch-registry: false
+#    service-url:
+#      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
