@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface CustomerClient {
 
     @GetMapping(value = "/{id}")
-    ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id);
+    ResponseEntity<Customer> getCustomerById(@PathVariable("id") Long id);
 
     @GetMapping(value = "/dni/{dni}")
     ResponseEntity<Customer> getCustomerByDni(@PathVariable("dni") String dni);

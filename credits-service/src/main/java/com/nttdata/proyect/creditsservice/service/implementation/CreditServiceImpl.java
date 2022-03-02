@@ -22,12 +22,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public Credit createCredit(Credit credit) {
-        Credit creditDB = getCredit(credit.getId());
-        if (creditDB != null) {
-            return creditDB;
-        }
-        creditDB =creditRepository.save(credit);
-        return creditDB;
+        return creditRepository.save(credit);
     }
 
     @Override
