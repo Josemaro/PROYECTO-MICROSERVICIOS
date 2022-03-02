@@ -7,6 +7,8 @@ import java.util.List;
 public interface CreditService {
     List<Credit> findAllCredits();
 
+    List<Credit> findAllByCustomerId(Long customerId);
+
     Credit createCredit(Credit credit);
 
     Credit updateCredit(Credit credit);

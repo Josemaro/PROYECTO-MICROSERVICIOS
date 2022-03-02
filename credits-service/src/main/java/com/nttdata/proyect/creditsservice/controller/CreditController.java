@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RestController
 @RequestMapping("/credits")
 public class CreditController {
@@ -23,8 +22,8 @@ public class CreditController {
     @Autowired
     CustomerClient customerClient;
 
-    @GetMapping("/customer/{id}")
-    public ResponseEntity<Customer> getCustomerById (@RequestParam Long id){
+    @GetMapping("/getCustomerBy/{id}")
+    public ResponseEntity<Customer> getCustomerById (@PathVariable("id") Long id){
         Customer customer = customerClient.getCustomerById(id).getBody();
         return ResponseEntity.ok().body(customer);
     }
@@ -39,9 +38,30 @@ public class CreditController {
         return ResponseEntity.ok().body(creditsWithCustomerData);
     }
 
+    @GetMapping("/customerCredits/{id}")
+    public ResponseEntity<List<Credit>> getAllCreditsOfOneCustomer (@PathVariable("id") Long id){
+
+        Customer customer = getCustomerById(id).getBody();
+        if(customer==null){
+//            log.info("\nCliente no encontrado");
+            return ResponseEntity.notFound().build();
+        }
+        List<Credit>credits = creditService.findAllByCustomerId(id);
+        if(credits.isEmpty()){
+//            log.info("\nNo se encontraron creditos");
+            return ResponseEntity.notFound().build();
+        }
+        List<Credit>creditsWithCustomerData = credits.stream().map(credit -> {
+            credit.setCustomer(getCustomerById(credit.getCustomerId()).getBody());
+            return credit;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok().body(creditsWithCustomerData);
+    }
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<Credit> getCreditById (@RequestParam Long id){
+    public ResponseEntity<Credit> getCreditById (@PathVariable("id") Long id){
         Credit creditDB = creditService.getCredit(id);
         if(creditDB==null){
             return ResponseEntity.badRequest().build();

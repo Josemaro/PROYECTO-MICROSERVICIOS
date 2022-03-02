@@ -17,16 +17,25 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public List<Credit> findAllCredits() {
+        log.info("\n\n===================\nfindAllCredits() in creditServiceImpl");
         return creditRepository.findAll();
     }
 
     @Override
+    public List<Credit> findAllByCustomerId( Long customerId ) {
+        log.info("\n\n===================\nfindByCustomerId() in creditServiceImpl");
+        return creditRepository.findByCustomerId(customerId);
+    }
+
+    @Override
     public Credit createCredit(Credit credit) {
+        log.info("\n\n===================\ncreateCredit() in creditServiceImpl");
         return creditRepository.save(credit);
     }
 
     @Override
     public Credit updateCredit(Credit credit) {
+        log.info("\n\n===================\nupdateCredit() in creditServiceImpl");
         Credit creditDB = getCredit(credit.getId());
         if (creditDB == null){
             return  null;
@@ -44,6 +53,7 @@ public class CreditServiceImpl implements CreditService {
 
     @Override
     public Credit getCredit(Long id) {
+        log.info("\n\n===================\ngetCredit() in creditServiceImpl");
         return creditRepository.findById(id).orElse(null);
     }
 }

@@ -161,7 +161,7 @@ public class AccountController {
     // ------------------------------MAKE A MOVEMENT-------------------------
 
     @PostMapping(value = "/movement/{accountId}")
-    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
+    public ResponseEntity<Movement> makeMovement(@PathVariable("accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
         log.info("MAKING A MOVEMENT");
         /*
          * Obtengo la cuenta de la base de datos
@@ -234,7 +234,7 @@ public class AccountController {
     // -------------------------CONSULTAR EL SALDO---------------------------------------------
 
     @GetMapping(value = "/{id}/balance")
-    public ResponseEntity<Double> balanceByAccountId(@RequestParam("id") Long id){
+    public ResponseEntity<Double> balanceByAccountId(@PathVariable("id") Long id){
         Double balance = accountService.getBalanceByAccount(id);
         return ResponseEntity.ok().body(balance);
     }
