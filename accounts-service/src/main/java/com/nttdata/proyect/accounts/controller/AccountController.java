@@ -52,15 +52,17 @@ public class AccountController {
         List<Account> accounts = new ArrayList<>();
         accounts = accountService.findAllAccounts();
 
-        log.info("mapping owners stream function");
+        /*
+         *  Al momento de traer el arreglo de cuentas
+         *  mapeo a los titulares y firmantes autorizados
+         *  ya que en su lista traen su id de cliente
+         *  dicha entidad se encuentra en otro endpoint
+         *
+         */
+        log.info("mapping owners and signers in stream function");
         List<Account> accountsFinal = accounts.stream().map(account -> {
             List<AccountOwner> ownerList = accountService.mapOwners(account);
             account.setOwners(ownerList);
-            return account;
-        }).collect(Collectors.toList());
-
-        log.info("mapping owners mapping signers");
-        accountsFinal = accountsFinal.stream().map(account -> {
             List<AccountSigner> signerList = accountService.mapSigners(account);
             account.setSigners(signerList);
             return account;
@@ -155,32 +157,54 @@ public class AccountController {
     }
 
     // -------------------MOVEMENTS------------------------------------------
+    // ------------------------------MAKE A MOVEMENT-------------------------
 
     @PostMapping(value = "/movement/{accountId}")
     public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody) throws AccountException {
         log.info("MAKING A MOVEMENT");
+        /*
+         * Obtengo la cuenta
+         * Obtengo el tipo de movimiento
+         * Para enviarlos posteriormente al método
+         */
         Account account = getAccount(accountId).getBody();
         MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
         Double amount = movementRequestBody.getAmount();
+        /*
+         * GUARDAR EL MOVIMIENTO Y VERIFICO
+         */
         Movement movement = accountService.saveMovement(account,type,amount);
-
         if(movement==null){
 //          throw new AccountException("xd");
             log.info("INVALID MOVEMENT REQUEST");
             return  ResponseEntity.badRequest().build();
         };
-
+        /*
+         * CALCULO EL BALANCE FINAL DE LA CUENTA
+         * Y ACTUALIZO EL BALANCE DEPENDIENDO EL TIPO
+         * DE MOVIMIENTO
+         */
         int typeId = Integer.parseInt(type.getId().toString());
         double balance = account.getBalance();
+
         Double finalBalance = accountService.calcFinalBalance(balance,typeId, movement.getAmount());
         account.setBalance(finalBalance);
         Account accountDB =  accountService.updateAccount(account);
+        /*
+         * VERIFICO SI SE ACTUALIZA
+         */
         if(accountDB == null){
             log.info("CAN'T UPDATE ACCOUNT");
             return  ResponseEntity.badRequest().build();
         }
+        /*
+         * Retorno el movimiento
+         */
         return ResponseEntity.ok().body(movement);
     }
+
+    // -------------------GET THE BALANCE BY ACCOUNT ------------------------------------------
+    // -------------------------CONSULTAR EL SALDO---------------------------------------------
 
     @GetMapping(value = "/{id}/balance")
     public ResponseEntity<Double> balanceByAccountId(@RequestParam("id") Long id){
