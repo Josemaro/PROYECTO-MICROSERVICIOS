@@ -4,13 +4,12 @@ import com.nttdata.proyect.creditsservice.client.CustomerClient;
 import com.nttdata.proyect.creditsservice.models.Customer;
 import com.nttdata.proyect.creditsservice.models.RBCreditRegistration;
 import com.nttdata.proyect.creditsservice.repository.entities.Credit;
-import com.nttdata.proyect.creditsservice.repository.entities.CreditCategory;
 import com.nttdata.proyect.creditsservice.service.CreditService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,12 +42,10 @@ public class CreditController {
 
         Customer customer = getCustomerById(id).getBody();
         if(customer==null){
-//            log.info("\nCliente no encontrado");
             return ResponseEntity.notFound().build();
         }
         List<Credit>credits = creditService.findAllByCustomerId(id);
         if(credits.isEmpty()){
-//            log.info("\nNo se encontraron creditos");
             return ResponseEntity.notFound().build();
         }
         List<Credit>creditsWithCustomerData = credits.stream().map(credit -> {
@@ -74,10 +71,12 @@ public class CreditController {
     public ResponseEntity<Credit> createCredit (@RequestBody RBCreditRegistration rbCreditRegistration){
         Credit creditBody = new Credit ();
         creditBody.setCustomerId(rbCreditRegistration.getCustomerId());
-        CreditCategory category = new CreditCategory();
-            category.setId(rbCreditRegistration.getCategoryId());
-        creditBody.setCategory(category);
-        creditBody.setCreditNumber(rbCreditRegistration.getCreditNumber());
+        creditBody.setCategory(rbCreditRegistration.getCategoryId());
+        creditBody.setCreditCode(rbCreditRegistration.getCreditCode());
+        creditBody.setInterestRate(rbCreditRegistration.getInterestRate());
+        creditBody.setMoneyAmount(rbCreditRegistration.getMoneyAmount());
+        creditBody.setNumberOfInstalments(rbCreditRegistration.getNumberOfInstalments());
+        creditBody.setCreateAt(LocalDate.now());
         return ResponseEntity.ok().body(creditService.createCredit(creditBody));
     }
 }

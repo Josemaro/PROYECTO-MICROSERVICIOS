@@ -135,6 +135,7 @@ public class AccountServiceImpl implements AccountService {
          */
         Long firstOwnerId = account.getOwners().get(0).getCustomerId();
         Long customerOwnerType = customerClient.getCustomer(firstOwnerId).getBody().getCategory().getId();
+        //  1L == CATEGORIA PERSONAL EN EL PRIMER PROPIETARIO DE LA CUENTA
         if(customerOwnerType==1L){
             log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN TENER VARIOS TITULARES");
             return null;
@@ -165,10 +166,12 @@ public class AccountServiceImpl implements AccountService {
          */
         Long firstOwnerId = account.getOwners().get(0).getCustomerId();
         Long customerOwnerType = customerClient.getCustomer(firstOwnerId).getBody().getCategory().getId();
+        //  1L == CATEGORIA PERSONAL EN EL PRIMER PROPIETARIO DE LA CUENTA
         if(customerOwnerType==1L){
             log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN FIRMANTES");
             return null;
         }
+        //  1L == CATEGORIA PERSONAL EN EL PRIMER PROPIETARIO DE LA CUENTA
         Long newSigner = customer.getCategory().getId();
         if(newSigner==1L){
             log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN SER FIRMANTES DE OTRAS CUENTAS");

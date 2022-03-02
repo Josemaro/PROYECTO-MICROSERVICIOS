@@ -4,7 +4,11 @@ import lombok.Data;
 
 @Data
 public class RBCreditRegistration {
-    private Long customerId;
+
+    private String creditCode;
     private Long categoryId;
-    private String creditNumber;
+    private Double interestRate;
+    private Double moneyAmount;
+    private int numberOfInstalments;
+    private Long customerId;
 }
