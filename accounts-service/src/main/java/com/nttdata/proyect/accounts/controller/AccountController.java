@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,6 +42,10 @@ public class AccountController {
         return accountService.getOwnedAccountsByCustomerId(id);
     }
 
+    @GetMapping(value = "{id}/movements")
+    public Integer getTotalMovementsOfTheMonth(@PathVariable("id") Long id) {
+        return accountService.getTotalMovementsOfTheMonthByAccount(id);
+    }
     // -------------------Retrieve all the accounts-------------------------------------------
 
     @GetMapping
@@ -48,15 +53,17 @@ public class AccountController {
         List<Account> accounts = new ArrayList<>();
         accounts = accountService.findAllAccounts();
 
-        log.info("mapping owners stream function");
+        /*
+         *  Al momento de traer el arreglo de cuentas
+         *  mapeo a los titulares y firmantes autorizados
+         *  ya que en su lista traen su id de cliente
+         *  dicha entidad se encuentra en otro endpoint
+         *
+         */
+        log.info("mapping owners and signers in stream function");
         List<Account> accountsFinal = accounts.stream().map(account -> {
             List<AccountOwner> ownerList = accountService.mapOwners(account);
             account.setOwners(ownerList);
-            return account;
-        }).collect(Collectors.toList());
-
-        log.info("mapping owners mapping signers");
-        accountsFinal = accountsFinal.stream().map(account -> {
             List<AccountSigner> signerList = accountService.mapSigners(account);
             account.setSigners(signerList);
             return account;
@@ -151,32 +158,80 @@ public class AccountController {
     }
 
     // -------------------MOVEMENTS------------------------------------------
+    // ------------------------------MAKE A MOVEMENT-------------------------
 
     @PostMapping(value = "/movement/{accountId}")
-    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody) throws AccountException {
+    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
         log.info("MAKING A MOVEMENT");
-        Account account = getAccount(accountId).getBody();
+        /*
+         * Obtengo la cuenta de la base de datos
+         * Obtengo el monto y el tipo de movimiento para ser usados posteriormente al momento de realizar el movimiento
+         */
         MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
         Double amount = movementRequestBody.getAmount();
+        Account account = getAccount(accountId).getBody();
+        if(account == null){
+            log.info("\n\nCUENTA NO ENCONTRADA\n\n");
+            return ResponseEntity.notFound().build();
+        }
+        /*
+         * OBTENGO LOS MOVIMIENTOS DE ESTE MES DE LA CUENTA Y VERIFICO QUE NO SOBREPASE EL LIMITE
+         */
+        int totalMovementsInThisMonth = getTotalMovementsOfTheMonth(account.getId());
+        if(totalMovementsInThisMonth+1>account.getMovementsLimit()){
+            log.info("\n\nNO SE PUEDEN REALIZAR MAS MOVIMIENTOS\n\n");
+            return ResponseEntity.badRequest().build();
+        }
+        /*
+         *  CASO: SI LA CUENTA ES DE PLAZO FIJO SOLO PUEDE HACER UNA OPERACION AL MES UN DÍA ESPECIFICO
+         *  (NUMERO DE LA FECHA DE REGISTRO)
+         */
+        if(account.getType().getId()==3){
+            LocalDate createAt =  account.getCreateAt();
+            LocalDate today = LocalDate.now();
+            int dayOfMonthNumberToday = today.getDayOfMonth();
+            int dayOfCreation = createAt.getDayOfMonth();
+            log.info("\nTODAY={}, CREATION DAY={}",dayOfMonthNumberToday,dayOfCreation);
+            if(dayOfCreation != dayOfMonthNumberToday){
+                log.info("\n\n NO SE PUEDE REALIZAR MOVIMINENTO ESTE DIA EN LA CUENTA DE PLAZO FIJO\n\n");
+                return ResponseEntity.badRequest().build();
+            }
+        }
+        /*
+         * GUARDAR EL MOVIMIENTO Y VERIFICO
+         */
         Movement movement = accountService.saveMovement(account,type,amount);
-
         if(movement==null){
 //          throw new AccountException("xd");
             log.info("INVALID MOVEMENT REQUEST");
             return  ResponseEntity.badRequest().build();
         };
-
+        /*
+         * CALCULO EL BALANCE FINAL DE LA CUENTA
+         * Y ACTUALIZO EL BALANCE DEPENDIENDO EL TIPO
+         * DE MOVIMIENTO
+         */
         int typeId = Integer.parseInt(type.getId().toString());
         double balance = account.getBalance();
+
         Double finalBalance = accountService.calcFinalBalance(balance,typeId, movement.getAmount());
         account.setBalance(finalBalance);
         Account accountDB =  accountService.updateAccount(account);
+        /*
+         * VERIFICO SI SE ACTUALIZA
+         */
         if(accountDB == null){
             log.info("CAN'T UPDATE ACCOUNT");
             return  ResponseEntity.badRequest().build();
         }
+        /*
+         * Retorno el movimiento
+         */
         return ResponseEntity.ok().body(movement);
     }
+
+    // -------------------GET THE BALANCE BY ACCOUNT ------------------------------------------
+    // -------------------------CONSULTAR EL SALDO---------------------------------------------
 
     @GetMapping(value = "/{id}/balance")
     public ResponseEntity<Double> balanceByAccountId(@RequestParam("id") Long id){

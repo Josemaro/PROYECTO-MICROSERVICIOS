@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
         {
             case 1:
                 commission = 0D;
-                movementsLimit = 30;
+                movementsLimit = 15;
                 break;
             case 2:
                 commission = 10D;
@@ -179,6 +180,12 @@ public class AccountServiceImpl implements AccountService {
         return movementTypeRepository.getById(id);
     }
 
+//    @Override
+//    public LocalDate getRegisterDate(Long id) {
+//        Account account = getAccount(id);
+//        return account.getCreateAt();
+//    }
+
     // -------------------Map Functions----------------------------------------------
 
     public List<AccountOwner> mapOwners(Account account) {
@@ -206,6 +213,7 @@ public class AccountServiceImpl implements AccountService {
         movement.setAccount(account);
         movement.setType(type);
         movement.setAmount(amount);
+        // prePersist se encarga de colocar la fecha de creacion en el objeto
         movement.prePersist();
 
         return movementRepository.save(movement);
@@ -225,6 +233,36 @@ public class AccountServiceImpl implements AccountService {
             finalBalance = initialBalance + (amount);
         }
         return finalBalance;
+    }
+
+    @Override
+    public Integer getTotalMovementsOfTheMonthByAccount(Long id) {
+        Account account= getAccount(id);
+        if(account==null){
+            return null;
+        }
+        LocalDate cal= LocalDate.now();
+        int thisMonth = cal.getMonth().getValue();
+        int thisYear = cal.getYear();
+        int nextMonth = thisMonth; // BEGINNING
+        int nextYear = thisYear;
+        if(thisMonth == 12){
+            nextMonth = 1;
+            nextYear = thisYear+1;
+        }else{
+            nextMonth=thisMonth+1;
+        }
+        log.info("\nyear====>{}\nmonth====>{}",thisYear,thisMonth);
+        log.info("\nyear====>{}\nnextMonth====>{}",nextYear,nextMonth);
+
+        String auxStartDateString = Integer.toString(thisYear)+"-"+Integer.toString(thisMonth)+"-"+1;
+        String auxEndDateString = Integer.toString(nextYear)+"-"+Integer.toString(nextMonth)+"-"+1;
+        log.info("\nstartDate====>{}",auxStartDateString);
+
+        int accountId = id.intValue();
+        int totalMovementsInThisMonth =  movementRepository.getAllBetweenDates(accountId,auxStartDateString,auxEndDateString).size();
+        log.info("\n{}",totalMovementsInThisMonth);
+        return totalMovementsInThisMonth;
     }
 
 }
