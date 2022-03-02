@@ -41,6 +41,10 @@ public class AccountController {
         return accountService.getOwnedAccountsByCustomerId(id);
     }
 
+    @GetMapping(value = "{id}/movements")
+    public Integer getTotalMovementsOfTheMonth(@PathVariable("id") Long id) {
+        return accountService.getTotalMovementsOfTheMonthByAccount(id);
+    }
     // -------------------Retrieve all the accounts-------------------------------------------
 
     @GetMapping

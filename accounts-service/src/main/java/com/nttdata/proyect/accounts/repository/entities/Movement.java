@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -26,8 +27,8 @@ public class Movement {
     private Double amount;
 
     @Column(name = "movement_date")
-    @Temporal(TemporalType.DATE)
-    private Date date;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movement_type_id")
@@ -37,6 +38,6 @@ public class Movement {
 
     @PrePersist
     public void prePersist() {
-        this.date = new Date();
+        this.date = LocalDate.now();
     }
 }

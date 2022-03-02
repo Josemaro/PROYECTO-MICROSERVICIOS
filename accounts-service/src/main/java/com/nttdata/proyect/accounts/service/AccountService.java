@@ -47,4 +47,6 @@ public interface AccountService {
 
     //----------------------CALCULATIONS---------------------------------------------
     double calcFinalBalance(Double initialBalance, int typeId, Double amount);
+
+    Integer getTotalMovementsOfTheMonthByAccount(Long id);
 }

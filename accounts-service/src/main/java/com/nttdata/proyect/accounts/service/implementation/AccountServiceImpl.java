@@ -9,7 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -225,6 +228,43 @@ public class AccountServiceImpl implements AccountService {
             finalBalance = initialBalance + (amount);
         }
         return finalBalance;
+    }
+
+    @Override
+    public Integer getTotalMovementsOfTheMonthByAccount(Long id) {
+        Account account= getAccount(id);
+        if(account==null){
+            return null;
+        }
+        LocalDate cal= LocalDate.now();
+        Date date= new Date();
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(date);
+        int thisMonth = cal.getMonth().getValue();
+        int thisYear = cal.getYear();
+        int thisDay = cal.getDayOfMonth();
+
+//        int thisMonth = cal.get(Calendar.MONTH);
+//        int thisYear = cal.get(Calendar.YEAR);
+//        int thisDay = cal.get(Calendar.DATE);
+//        int thisHour = cal.get(Calendar.HOUR);
+//        int nextMonth = thisMonth; // BEGINNING
+//        int nextYear = thisYear;
+//        if(thisMonth == 12){
+//            nextMonth = 1;
+//            nextYear = thisYear+1;
+//        }
+        Calendar auxStartDate = Calendar.getInstance();
+        Calendar auxEndDate = Calendar.getInstance();
+
+        auxStartDate.set(thisYear,thisMonth,1);
+        auxEndDate.set(thisYear,thisMonth,1);
+
+        log.info("\nyear====>{}\nmonth====>{}\nday====>{}",thisYear,thisMonth,thisDay);
+        Date startDate = auxStartDate.getTime();
+        Date endDate = auxEndDate.getTime();
+
+        return movementRepository.getAllBetweenDates(startDate,endDate).size();
     }
 
 }

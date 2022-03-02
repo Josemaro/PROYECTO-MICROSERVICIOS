@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -49,8 +49,8 @@ public class Account implements Serializable{
     private Double commission;
 
     @Column(name = "create_at")
-    @Temporal(TemporalType.DATE)
-    private Date createAt;
+//    @Temporal(TemporalType.DATE)
+    private LocalDate createAt;
 
     @Column(name="movements_limit")
     private int movementsLimit;
@@ -62,7 +62,7 @@ public class Account implements Serializable{
 
     @PrePersist
     public void prePersist() {
-        this.createAt = new Date();
+        this.createAt = LocalDate.now();
         this.state = "CREATED";
     }
 
