@@ -3,6 +3,7 @@ package com.nttdata.proyect.accounts.service;
 import com.nttdata.proyect.accounts.models.Customer;
 import com.nttdata.proyect.accounts.repository.entities.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface AccountService {
@@ -26,7 +27,7 @@ public interface AccountService {
     Account addSigner(Account account, Customer customer);
 
 
-    //---------------------------------------------------------------------------------
+    //-------------------------------ACCOUNT-CUSTOMER FUNCTIONS------------------------
 
     int getOwnedAccountsByCustomerId(Long id);
 
@@ -35,6 +36,8 @@ public interface AccountService {
     Double getBalanceByAccount(Long id);
 
     MovementType getMovementType(Long id);
+
+//    LocalDate getRegisterDate(Long id);
 
     //----------------------MAP FUNCTIONS----------------------------------------------
 

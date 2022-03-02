@@ -180,6 +180,12 @@ public class AccountServiceImpl implements AccountService {
         return movementTypeRepository.getById(id);
     }
 
+//    @Override
+//    public LocalDate getRegisterDate(Long id) {
+//        Account account = getAccount(id);
+//        return account.getCreateAt();
+//    }
+
     // -------------------Map Functions----------------------------------------------
 
     public List<AccountOwner> mapOwners(Account account) {
@@ -207,6 +213,7 @@ public class AccountServiceImpl implements AccountService {
         movement.setAccount(account);
         movement.setType(type);
         movement.setAmount(amount);
+        // prePersist se encarga de colocar la fecha de creacion en el objeto
         movement.prePersist();
 
         return movementRepository.save(movement);

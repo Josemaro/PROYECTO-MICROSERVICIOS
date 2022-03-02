@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -163,27 +164,39 @@ public class AccountController {
     public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
         log.info("MAKING A MOVEMENT");
         /*
-         * Obtengo la cuenta de la base de datos y verifico que no haya superado cantidad de movimientos mensuales
+         * Obtengo la cuenta de la base de datos
+         * Obtengo el monto y el tipo de movimiento para ser usados posteriormente al momento de realizar el movimiento
          */
+        MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
+        Double amount = movementRequestBody.getAmount();
         Account account = getAccount(accountId).getBody();
         if(account == null){
             log.info("\n\nCUENTA NO ENCONTRADA\n\n");
             return ResponseEntity.notFound().build();
         }
+        /*
+         * OBTENGO LOS MOVIMIENTOS DE ESTE MES DE LA CUENTA Y VERIFICO QUE NO SOBREPASE EL LIMITE
+         */
         int totalMovementsInThisMonth = getTotalMovementsOfTheMonth(account.getId());
-
         if(totalMovementsInThisMonth+1>account.getMovementsLimit()){
             log.info("\n\nNO SE PUEDEN REALIZAR MAS MOVIMIENTOS\n\n");
             return ResponseEntity.badRequest().build();
         }
-
         /*
-         * Obtengo el tipo de movimiento
-         * Para enviarlos posteriormente al método
+         *  CASO: SI LA CUENTA ES DE PLAZO FIJO SOLO PUEDE HACER UNA OPERACION AL MES UN DÍA ESPECIFICO
+         *  (NUMERO DE LA FECHA DE REGISTRO)
          */
-        MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
-        Double amount = movementRequestBody.getAmount();
-
+        if(account.getType().getId()==3){
+            LocalDate createAt =  account.getCreateAt();
+            LocalDate today = LocalDate.now();
+            int dayOfMonthNumberToday = today.getDayOfMonth();
+            int dayOfCreation = createAt.getDayOfMonth();
+            log.info("\nTODAY={}, CREATION DAY={}",dayOfMonthNumberToday,dayOfCreation);
+            if(dayOfCreation != dayOfMonthNumberToday){
+                log.info("\n\n NO SE PUEDE REALIZAR MOVIMINENTO ESTE DIA EN LA CUENTA DE PLAZO FIJO\n\n");
+                return ResponseEntity.badRequest().build();
+            }
+        }
         /*
          * GUARDAR EL MOVIMIENTO Y VERIFICO
          */
