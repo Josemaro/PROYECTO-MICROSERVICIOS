@@ -237,34 +237,25 @@ public class AccountServiceImpl implements AccountService {
             return null;
         }
         LocalDate cal= LocalDate.now();
-        Date date= new Date();
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(date);
         int thisMonth = cal.getMonth().getValue();
         int thisYear = cal.getYear();
-        int thisDay = cal.getDayOfMonth();
+        int nextMonth = thisMonth; // BEGINNING
+        int nextYear = thisYear;
+        if(thisMonth == 12){
+            nextMonth = 1;
+            nextYear = thisYear+1;
+        }else{
+            nextMonth=thisMonth+1;
+        }
+        log.info("\nyear====>{}\nmonth====>{}",thisYear,thisMonth);
+        log.info("\nyear====>{}\nnextMonth====>{}",nextYear,nextMonth);
 
-//        int thisMonth = cal.get(Calendar.MONTH);
-//        int thisYear = cal.get(Calendar.YEAR);
-//        int thisDay = cal.get(Calendar.DATE);
-//        int thisHour = cal.get(Calendar.HOUR);
-//        int nextMonth = thisMonth; // BEGINNING
-//        int nextYear = thisYear;
-//        if(thisMonth == 12){
-//            nextMonth = 1;
-//            nextYear = thisYear+1;
-//        }
-        Calendar auxStartDate = Calendar.getInstance();
-        Calendar auxEndDate = Calendar.getInstance();
+        String auxStartDateString = Integer.toString(thisYear)+"-"+Integer.toString(thisMonth)+"-"+1;
+        String auxEndDateString = Integer.toString(nextYear)+"-"+Integer.toString(nextMonth)+"-"+1;
+        log.info("\nstartDate====>{}",auxStartDateString);
 
-        auxStartDate.set(thisYear,thisMonth,1);
-        auxEndDate.set(thisYear,thisMonth,1);
-
-        log.info("\nyear====>{}\nmonth====>{}\nday====>{}",thisYear,thisMonth,thisDay);
-        Date startDate = auxStartDate.getTime();
-        Date endDate = auxEndDate.getTime();
-
-        return movementRepository.getAllBetweenDates(startDate,endDate).size();
+        int accountId = id.intValue();
+        return movementRepository.getAllBetweenDates(accountId,auxStartDateString,auxEndDateString).size();
     }
 
 }

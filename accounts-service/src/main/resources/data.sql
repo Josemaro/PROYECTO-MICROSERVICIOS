@@ -18,8 +18,15 @@ INSERT INTO tbl_account_owners (customer_id, account_id) values (3,3);
 INSERT INTO tbl_account_owners (customer_id, account_id) values (4,4);
 INSERT INTO tbl_account_owners (customer_id, account_id) values (4,5);
 INSERT INTO tbl_account_owners (customer_id, account_id) values (5,5);
+INSERT INTO tbl_account_owners (customer_id, account_id) values (4,6);
 
 INSERT INTO tbl_account_signers (customer_id, account_id) values (4,5);
 INSERT INTO tbl_account_signers (customer_id, account_id) values (5,5);
 
-INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (100,'2022-02-01',1,1)
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (100,'2022-02-01',1,1);
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (150,'2022-02-01',1,1);
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (200,'2022-02-01',1,1);
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (170,'2022-03-01',1,1);
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (250,'2022-03-15',1,2);
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (250,'2022-03-15',1,2);
+INSERT INTO tbl_movements (amount,movement_date,account_id,movement_type_id) values (50,'2022-04-01',1,2);
