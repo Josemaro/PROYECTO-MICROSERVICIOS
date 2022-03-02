@@ -113,7 +113,7 @@ public class AccountController {
          *múltiples cuentas corrientes.
          */
         if (customerDB.getCategory().getId() == 2 && (accountType.getId() == 1 || accountType.getId() == 3)) {
-            log.info("A BUSINESS CUSTOMER CAN'T HAVE A FIX-TERM ACCOUNT OR SAVINGS ACCOUNT");
+            log.info("\n===================\nA BUSINESS CUSTOMER CAN'T HAVE A FIX-TERM ACCOUNT OR SAVINGS ACCOUNT");
             return ResponseEntity.badRequest().build();
         }
         // ----------------------A personal customer only can have one account------------------------------------------
@@ -141,7 +141,7 @@ public class AccountController {
      */
     @PostMapping(value = "/addOwner")
     public ResponseEntity<Account> addOwner(@RequestBody AddOwnerSignerBody addOwnerSignerBody){
-        log.info("IN ADD OWNER FUNCTION");
+        log.info("\n===================\nIN ADD OWNER FUNCTION");
         Customer customer = customerClient.getCustomerByDni(addOwnerSignerBody.getCustomerDni()).getBody();
         Account account = getAccount(addOwnerSignerBody.getAccountId()).getBody();
         Account accountDB = accountService.addOwner(account,customer);
@@ -203,7 +203,7 @@ public class AccountController {
         Movement movement = accountService.saveMovement(account,type,amount);
         if(movement==null){
 //          throw new AccountException("xd");
-            log.info("INVALID MOVEMENT REQUEST");
+            log.info("\n\n===================\nINVALID MOVEMENT REQUEST");
             return  ResponseEntity.badRequest().build();
         };
         /*
@@ -221,7 +221,7 @@ public class AccountController {
          * VERIFICO SI SE ACTUALIZA
          */
         if(accountDB == null){
-            log.info("CAN'T UPDATE ACCOUNT");
+            log.info("\n\n===================\nCAN'T UPDATE ACCOUNT");
             return  ResponseEntity.badRequest().build();
         }
         /*
