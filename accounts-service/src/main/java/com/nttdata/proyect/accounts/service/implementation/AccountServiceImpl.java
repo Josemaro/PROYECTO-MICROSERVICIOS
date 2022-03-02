@@ -65,7 +65,7 @@ public class AccountServiceImpl implements AccountService {
         {
             case 1:
                 commission = 0D;
-                movementsLimit = 30;
+                movementsLimit = 15;
                 break;
             case 2:
                 commission = 10D;
@@ -253,7 +253,9 @@ public class AccountServiceImpl implements AccountService {
         log.info("\nstartDate====>{}",auxStartDateString);
 
         int accountId = id.intValue();
-        return movementRepository.getAllBetweenDates(accountId,auxStartDateString,auxEndDateString).size();
+        int totalMovementsInThisMonth =  movementRepository.getAllBetweenDates(accountId,auxStartDateString,auxEndDateString).size();
+        log.info("\n{}",totalMovementsInThisMonth);
+        return totalMovementsInThisMonth;
     }
 
 }

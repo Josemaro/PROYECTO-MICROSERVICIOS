@@ -160,16 +160,30 @@ public class AccountController {
     // ------------------------------MAKE A MOVEMENT-------------------------
 
     @PostMapping(value = "/movement/{accountId}")
-    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody) throws AccountException {
+    public ResponseEntity<Movement> makeMovement(@RequestParam(value = "accountId") Long accountId, @RequestBody MovementRequestBody movementRequestBody){
         log.info("MAKING A MOVEMENT");
         /*
-         * Obtengo la cuenta
+         * Obtengo la cuenta de la base de datos y verifico que no haya superado cantidad de movimientos mensuales
+         */
+        Account account = getAccount(accountId).getBody();
+        if(account == null){
+            log.info("\n\nCUENTA NO ENCONTRADA\n\n");
+            return ResponseEntity.notFound().build();
+        }
+        int totalMovementsInThisMonth = getTotalMovementsOfTheMonth(account.getId());
+
+        if(totalMovementsInThisMonth+1>account.getMovementsLimit()){
+            log.info("\n\nNO SE PUEDEN REALIZAR MAS MOVIMIENTOS\n\n");
+            return ResponseEntity.badRequest().build();
+        }
+
+        /*
          * Obtengo el tipo de movimiento
          * Para enviarlos posteriormente al método
          */
-        Account account = getAccount(accountId).getBody();
         MovementType type = accountService.getMovementType(movementRequestBody.getTypeId());
         Double amount = movementRequestBody.getAmount();
+
         /*
          * GUARDAR EL MOVIMIENTO Y VERIFICO
          */
