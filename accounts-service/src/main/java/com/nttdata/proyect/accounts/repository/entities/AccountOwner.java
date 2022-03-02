@@ -4,12 +4,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.nttdata.proyect.accounts.models.Customer;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Data
 @Table(name = "tbl_account_owners")
+@NoArgsConstructor
 public class AccountOwner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
