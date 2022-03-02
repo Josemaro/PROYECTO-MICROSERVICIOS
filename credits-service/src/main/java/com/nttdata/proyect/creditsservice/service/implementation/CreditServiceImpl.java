@@ -1,7 +1,9 @@
 package com.nttdata.proyect.creditsservice.service.implementation;
 
 import com.nttdata.proyect.creditsservice.repository.CreditRepository;
+import com.nttdata.proyect.creditsservice.repository.PaymentRepository;
 import com.nttdata.proyect.creditsservice.repository.entities.Credit;
+import com.nttdata.proyect.creditsservice.repository.entities.Payment;
 import com.nttdata.proyect.creditsservice.service.CreditService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,9 @@ import java.util.List;
 public class CreditServiceImpl implements CreditService {
     @Autowired
     CreditRepository creditRepository;
+
+    @Autowired
+    PaymentRepository paymentRepository;
 
     @Override
     public List<Credit> findAllCredits() {
@@ -31,6 +36,11 @@ public class CreditServiceImpl implements CreditService {
     public Credit createCredit(Credit credit) {
         log.info("\n\n===================\ncreateCredit() in creditServiceImpl");
         return creditRepository.save(credit);
+    }
+
+    @Override
+    public Payment createPayment(Payment payment) {
+        return paymentRepository.save(payment);
     }
 
     @Override
@@ -55,5 +65,10 @@ public class CreditServiceImpl implements CreditService {
     public Credit getCredit(Long id) {
         log.info("\n\n===================\ngetCredit() in creditServiceImpl");
         return creditRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Payment> getPaymentsByCreditId(Long id) {
+        return paymentRepository.findByCreditId(id);
     }
 }
