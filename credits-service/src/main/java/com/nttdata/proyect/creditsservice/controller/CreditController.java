@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,7 +68,7 @@ public class CreditController {
     }
 
     @GetMapping("/paymentsByCreditId/{id}")
-    public ResponseEntity<List<Payment>> getPaymentsBy (@PathVariable("id") Long id){
+    public ResponseEntity<List<Payment>> getPaymentsByCreditId(@PathVariable("id") Long id){
         Credit creditDB = getCreditById(id).getBody();
         if(creditDB==null){
             return ResponseEntity.badRequest().build();
@@ -80,7 +79,7 @@ public class CreditController {
 
     @GetMapping("/paymentsPaidByCreditId/{id}")
     public ResponseEntity<List<Payment>> getPaymentsPaid (@PathVariable("id") Long id){
-        List<Payment> payments = getPaymentsBy(id).getBody();
+        List<Payment> payments = getPaymentsByCreditId(id).getBody();
         assert payments != null;
         List<Payment> paidPayments = payments.stream().filter(p->{
             return p.getState().equals("PAID");
@@ -90,7 +89,7 @@ public class CreditController {
 
     @GetMapping("/paymentsPendingByCreditId/{id}")
     public ResponseEntity<List<Payment>> getPaymentsNotPaid (@PathVariable("id") Long id){
-        List<Payment> payments = getPaymentsBy(id).getBody();
+        List<Payment> payments = getPaymentsByCreditId(id).getBody();
         assert payments != null;
         List<Payment> paidPayments = payments.stream().filter(p->{
             return p.getState().equals("PENDING");
@@ -98,6 +97,12 @@ public class CreditController {
         return ResponseEntity.ok().body(paidPayments);
     }
 
+    @GetMapping("/payAPayment/{id}")
+    public ResponseEntity<Payment> payAPayment (@PathVariable("id") Long id){
+        Payment payment = creditService.getPayment(id);
+        Payment paymentUpdated = creditService.payAPayment(payment);
+        return ResponseEntity.ok().body(paymentUpdated);
+    }
 
     @PostMapping("/registerCredit")
     public ResponseEntity<Credit> createCredit (@RequestBody RBCreditRegistration rbCreditRegistration){

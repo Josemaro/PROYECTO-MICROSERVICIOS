@@ -16,9 +16,13 @@ public interface CreditService {
 
     Credit updateCredit(Credit credit);
 
+    Payment payAPayment(Payment payment);
+
     void deleteCredit(Credit credit);
 
     Credit getCredit(Long id);
+
+    Payment getPayment(Long id);
 
     List<Payment> getPaymentsByCreditId(Long id);
 

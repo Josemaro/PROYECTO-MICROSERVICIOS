@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -57,6 +58,19 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Override
+    public Payment payAPayment(Payment payment) {
+        log.info("\n\n===================\nupdatePayment() in creditServiceImpl");
+        Payment paymentDB = getPayment(payment.getId());
+        if (paymentDB == null){
+            return  null;
+        }
+        paymentDB.setCreateAt(LocalDate.now());
+        paymentDB.setState("PAID");
+
+        return paymentRepository.save(paymentDB);
+    }
+
+    @Override
     public void deleteCredit(Credit credit) {
 
     }
@@ -65,6 +79,12 @@ public class CreditServiceImpl implements CreditService {
     public Credit getCredit(Long id) {
         log.info("\n\n===================\ngetCredit() in creditServiceImpl");
         return creditRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Payment getPayment(Long id) {
+        log.info("\n\n===================\ngetCredit() in creditServiceImpl");
+        return paymentRepository.findById(id).orElse(null);
     }
 
     @Override
