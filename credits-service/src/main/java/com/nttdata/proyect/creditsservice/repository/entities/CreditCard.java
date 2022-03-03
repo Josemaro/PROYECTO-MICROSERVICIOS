@@ -18,6 +18,12 @@ public class CreditCard {
     @Column(name="customer_id")
     private Long customerId;
 
+    @Column(name="limit_credit")
+    private Double limitCredit;
+
+    @Column(name="balance")
+    private Double balance;
+
     @Column(name = "create_at")
     private LocalDate createAt;
 

@@ -28,13 +28,9 @@ public class Consumption {
 
     //"PENDING" or "PAID"
     @Column(name = "state")
-    private String state;
+    private String detail;
 
     @Column(name = "create_at")
     private LocalDate createAt;
 
-    @PrePersist
-    public void prePersist(){
-        this.state = "PENDING";
-    }
 }
