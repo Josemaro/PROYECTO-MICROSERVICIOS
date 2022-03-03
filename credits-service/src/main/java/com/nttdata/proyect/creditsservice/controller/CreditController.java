@@ -98,8 +98,17 @@ public class CreditController {
     @PostMapping("/registerCredit")
     public ResponseEntity<Credit> createCredit(@RequestBody RBCreditRegistration rbCreditRegistration) {
         Credit creditBody = new Credit();
+        Customer customer = customerClient.getCustomerById(rbCreditRegistration.getCustomerId()).getBody();
+        if(customer==null){
+            return ResponseEntity.notFound().build();
+        }
+        // SOLO PERMITE UN CREDITO POR PERSONA
+        if(!creditService.canGetACredit(customer)){
+            return ResponseEntity.badRequest().build();
+        }
+
         creditBody.setCustomerId(rbCreditRegistration.getCustomerId());
-        creditBody.setCategory(rbCreditRegistration.getCategoryId());
+        creditBody.setCategory(customer.getCategory().getId());
         creditBody.setCreditCode(rbCreditRegistration.getCreditCode());
         creditBody.setInterestRate(rbCreditRegistration.getInterestRate());
         creditBody.setMoneyAmount(rbCreditRegistration.getMoneyAmount());

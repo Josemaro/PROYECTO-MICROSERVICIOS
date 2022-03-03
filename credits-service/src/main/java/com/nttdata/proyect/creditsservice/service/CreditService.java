@@ -1,5 +1,6 @@
 package com.nttdata.proyect.creditsservice.service;
 
+import com.nttdata.proyect.creditsservice.models.Customer;
 import com.nttdata.proyect.creditsservice.repository.entities.Credit;
 import com.nttdata.proyect.creditsservice.repository.entities.Payment;
 
@@ -26,4 +27,5 @@ public interface CreditService {
 
     List<Payment> getPaymentsByCreditId(Long id);
 
+    boolean canGetACredit(Customer customer);
 }

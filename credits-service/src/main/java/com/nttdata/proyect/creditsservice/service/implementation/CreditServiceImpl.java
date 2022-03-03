@@ -1,5 +1,6 @@
 package com.nttdata.proyect.creditsservice.service.implementation;
 
+import com.nttdata.proyect.creditsservice.models.Customer;
 import com.nttdata.proyect.creditsservice.repository.CreditRepository;
 import com.nttdata.proyect.creditsservice.repository.PaymentRepository;
 import com.nttdata.proyect.creditsservice.repository.entities.Credit;
@@ -90,5 +91,24 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public List<Payment> getPaymentsByCreditId(Long id) {
         return paymentRepository.findByCreditId(id);
+    }
+
+    @Override
+    public boolean canGetACredit(Customer customer) {
+        //1 personal, 2 business
+        Long categoryId = customer.getCategory().getId();
+        log.info("{}===={}",categoryId,1);
+        if(categoryId == 1L){
+            log.info("credito personal");
+            if(findAllByCustomerId(customer.getId()).size()==0){
+                log.info("{}===={}",findAllByCustomerId(categoryId).size(),0);
+                return true;
+            }else {
+                log.info("un cliente personal solo puede tener un credito");
+                return false;
+            }
+        }
+        log.info("credito empresarial");
+        return true;
     }
 }
