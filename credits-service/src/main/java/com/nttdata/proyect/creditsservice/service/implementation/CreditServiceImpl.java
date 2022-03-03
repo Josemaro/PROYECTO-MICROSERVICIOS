@@ -1,12 +1,15 @@
 package com.nttdata.proyect.creditsservice.service.implementation;
 
 import com.nttdata.proyect.creditsservice.repository.CreditRepository;
+import com.nttdata.proyect.creditsservice.repository.PaymentRepository;
 import com.nttdata.proyect.creditsservice.repository.entities.Credit;
+import com.nttdata.proyect.creditsservice.repository.entities.Payment;
 import com.nttdata.proyect.creditsservice.service.CreditService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -14,6 +17,9 @@ import java.util.List;
 public class CreditServiceImpl implements CreditService {
     @Autowired
     CreditRepository creditRepository;
+
+    @Autowired
+    PaymentRepository paymentRepository;
 
     @Override
     public List<Credit> findAllCredits() {
@@ -34,6 +40,11 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Override
+    public Payment createPayment(Payment payment) {
+        return paymentRepository.save(payment);
+    }
+
+    @Override
     public Credit updateCredit(Credit credit) {
         log.info("\n\n===================\nupdateCredit() in creditServiceImpl");
         Credit creditDB = getCredit(credit.getId());
@@ -47,6 +58,19 @@ public class CreditServiceImpl implements CreditService {
     }
 
     @Override
+    public Payment payAPayment(Payment payment) {
+        log.info("\n\n===================\nupdatePayment() in creditServiceImpl");
+        Payment paymentDB = getPayment(payment.getId());
+        if (paymentDB == null){
+            return  null;
+        }
+        paymentDB.setCreateAt(LocalDate.now());
+        paymentDB.setState("PAID");
+
+        return paymentRepository.save(paymentDB);
+    }
+
+    @Override
     public void deleteCredit(Credit credit) {
 
     }
@@ -55,5 +79,16 @@ public class CreditServiceImpl implements CreditService {
     public Credit getCredit(Long id) {
         log.info("\n\n===================\ngetCredit() in creditServiceImpl");
         return creditRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public Payment getPayment(Long id) {
+        log.info("\n\n===================\ngetCredit() in creditServiceImpl");
+        return paymentRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Payment> getPaymentsByCreditId(Long id) {
+        return paymentRepository.findByCreditId(id);
     }
 }

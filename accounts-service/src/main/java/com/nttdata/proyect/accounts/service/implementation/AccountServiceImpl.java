@@ -43,16 +43,19 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> findAllAccounts() {
+        log.info("\n\n===================\nfindAllAccounts() in AccountServiceImpl");
         return accountRepository.findAll();
     }
 
     @Override
     public List<Account> findAccountsByType(AccountType type) {
+        log.info("\n\n===================\nfindAccountsByType() in AccountServiceImpl");
         return accountRepository.findByType(type);
     }
 
     @Override
     public Account createAccount(String accountNumber,Double initialBalance, AccountType accountType, Customer customer) {
+        log.info("\n\n===================\ncreateAccount() in AccountServiceImpl");
         List<AccountOwner> owners = new ArrayList<>();
         AccountOwner owner = new AccountOwner();
         owner.setCustomerId(customer.getId());
@@ -92,8 +95,10 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account updateAccount(Account account) {
+        log.info("\n\n===================\nupdateAccount() in AccountServiceImpl");
         Account accountDB = getAccount(account.getId());
         if (accountDB == null) {
+        log.info("\n\n===================\naccountDB is null");
             return null;
         }
         accountDB.setState(account.getState());
@@ -112,24 +117,40 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account getAccount(Long id) {
+        log.info("\n\n===================\ngetAccount() in AccountServiceImpl");
         return accountRepository.findById(id).orElse(null);
     }
 
     @Override
     public AccountType getAccountType(Long id) {
+        log.info("\n\n===================\ngetAccountType() in AccountServiceImpl");
         return accountTypeRepository.findById(id).orElse(null);
     }
 
     @Override
     public Account addOwner(Account account, Customer customer) {
-
+        log.info("\n\n===================\naddOwner() in AccountServiceImpl");
+        /*
+         * SOLO CUENTAS EMPRESARIALES PUEDEN TENER VARIOS TITULARES
+         */
+        Long firstOwnerId = account.getOwners().get(0).getCustomerId();
+        Long customerOwnerType = customerClient.getCustomer(firstOwnerId).getBody().getCategory().getId();
+        //  1L == CATEGORIA PERSONAL EN EL PRIMER PROPIETARIO DE LA CUENTA
+        if(customerOwnerType==1L){
+            log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN TENER VARIOS TITULARES");
+            return null;
+        }
+        Long newOwner = customer.getCategory().getId();
+        if(newOwner==1L){
+            log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN SER TITULARES DE OTRAS CUENTAS");
+            return null;
+        }
         List<AccountOwner> owners = new ArrayList<>();
         AccountOwner owner = new AccountOwner();
         owner.setCustomerId(customer.getId());
         owner.setCustomer(customer);
         owners.add(owner);
         account.setOwners(owners);
-
         Account accountDB = accountRepository.save(account);
         owner.setAccount(accountDB);
         //If accountDB is successfully created
@@ -140,7 +161,23 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Account addSigner(Account account, Customer customer) {
-
+        /*
+         * SOLO CUENTAS EMPRESARIALES PUEDEN TENER FIRMANTES AUTORIZADOS
+         */
+        Long firstOwnerId = account.getOwners().get(0).getCustomerId();
+        Long customerOwnerType = customerClient.getCustomer(firstOwnerId).getBody().getCategory().getId();
+        //  1L == CATEGORIA PERSONAL EN EL PRIMER PROPIETARIO DE LA CUENTA
+        if(customerOwnerType==1L){
+            log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN FIRMANTES");
+            return null;
+        }
+        //  1L == CATEGORIA PERSONAL EN EL PRIMER PROPIETARIO DE LA CUENTA
+        Long newSigner = customer.getCategory().getId();
+        if(newSigner==1L){
+            log.info("\n\n===================\nSOLO CUENTAS EMPRESARIALES PUEDEN SER FIRMANTES DE OTRAS CUENTAS");
+            return null;
+        }
+        log.info("\n\n===================\naddSigner() in AccountServiceImpl");
         List<AccountSigner> signers = new ArrayList<>();
         AccountSigner signer = new AccountSigner();
         signer.setCustomerId(customer.getId());
