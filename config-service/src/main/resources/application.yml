@@ -2,12 +2,14 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: config-server
   cloud:
     config:
+      enabled: true
       server:
         git:
-          uri: D:\REPOSITORIOS\PROYECTO\PROYECTO-MICROSERVICIOS\
-          searchPaths: config-data
+          uri: D:\REPOSITORIOS\CLOUDCONFIG\config-data
   security:
     user:
       name: root
