@@ -1,6 +1,7 @@
 package com.nttdata.proyect.creditsservice.service.implementation;
 
 import com.nttdata.proyect.creditsservice.client.CustomerClient;
+import com.nttdata.proyect.creditsservice.models.Customer;
 import com.nttdata.proyect.creditsservice.repository.CreditCardRepository;
 import com.nttdata.proyect.creditsservice.repository.entities.CreditCard;
 import com.nttdata.proyect.creditsservice.service.CreditCardService;
@@ -32,8 +33,19 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     @Override
-    public CreditCard createCreditCard(CreditCard credit) {
+    public CreditCard registerCreditCard(CreditCard credit) {
         log.info("\n\n===================\ncreateCreditCard() in creditServiceImpl");
         return creditCardRepository.save(credit);
+    }
+
+    @Override
+    public boolean canGetACreditCard(Customer customer) {
+        if(findAllByCustomerId(customer.getId()).size()==0){
+            log.info("\nAun no posee una tarjeta de credito");
+            return true;
+        }else {
+            log.info("\nYa posee una tarjeta de credito");
+            return false;
+        }
     }
 }
