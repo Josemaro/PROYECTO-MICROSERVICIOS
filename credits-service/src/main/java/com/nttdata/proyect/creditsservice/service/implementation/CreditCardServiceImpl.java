@@ -2,7 +2,9 @@ package com.nttdata.proyect.creditsservice.service.implementation;
 
 import com.nttdata.proyect.creditsservice.client.CustomerClient;
 import com.nttdata.proyect.creditsservice.models.Customer;
+import com.nttdata.proyect.creditsservice.repository.ConsumptionRepository;
 import com.nttdata.proyect.creditsservice.repository.CreditCardRepository;
+import com.nttdata.proyect.creditsservice.repository.entities.Consumption;
 import com.nttdata.proyect.creditsservice.repository.entities.CreditCard;
 import com.nttdata.proyect.creditsservice.service.CreditCardService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,11 +21,28 @@ public class CreditCardServiceImpl implements CreditCardService {
     CreditCardRepository creditCardRepository;
     @Autowired
     CustomerClient customerClient;
+    @Autowired
+    ConsumptionRepository consumptionRepository;
+
+    @Override
+    public CreditCard findCreditCardById(Long id) {
+        log.info("\n\n===================\nfindAllCreditCards() in creditServiceImpl");
+        return creditCardRepository.findById(id).orElse(null);
+    }
 
     @Override
     public List<CreditCard> findAllCreditCards() {
         log.info("\n\n===================\nfindAllCreditCards() in creditServiceImpl");
         return creditCardRepository.findAll();
+    }
+
+    @Override
+    public List<Consumption> findAllConsumption(Long creditCardId) {
+        log.info("\n\n===================\nfindAllCreditCards() in creditServiceImpl");
+        if(findCreditCardById(creditCardId)==null){
+            return null;
+        };
+        return consumptionRepository.findByCreditCardId(creditCardId);
     }
 
     @Override
@@ -47,5 +66,25 @@ public class CreditCardServiceImpl implements CreditCardService {
             log.info("\nYa posee una tarjeta de credito");
             return false;
         }
+    }
+
+    @Override
+    public Consumption saveConsumption(CreditCard creditCard,Consumption consumption) {
+        Double balance = creditCard.getBalance();
+        Double consumptionAmount = consumption.getAmount();
+        if(balance==0L){
+            log.info("SIN FONDOS");
+            return null;
+        }
+        if(consumptionAmount>balance){
+            log.info("FONDOS INSUFICIENTES");
+            return null;
+        }
+        Double newBalance = balance-consumptionAmount;
+        Consumption consumptionDB = consumptionRepository.save(consumption);
+        creditCard.setBalance(newBalance);
+        creditCardRepository.save(creditCard);
+
+        return consumptionDB;
     }
 }

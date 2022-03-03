@@ -2,7 +2,9 @@ package com.nttdata.proyect.creditsservice.controller;
 
 import com.nttdata.proyect.creditsservice.client.CustomerClient;
 import com.nttdata.proyect.creditsservice.models.Customer;
+import com.nttdata.proyect.creditsservice.models.RBCreditCardConsumption;
 import com.nttdata.proyect.creditsservice.models.RBCreditCardRegistration;
+import com.nttdata.proyect.creditsservice.repository.entities.Consumption;
 import com.nttdata.proyect.creditsservice.repository.entities.Credit;
 import com.nttdata.proyect.creditsservice.repository.entities.CreditCard;
 import com.nttdata.proyect.creditsservice.service.CreditCardService;
@@ -41,7 +43,17 @@ public class CreditCardController {
         return ResponseEntity.ok().body(creditCardDB);
     }
 
-    @PostMapping("/registerCredit")
+    @GetMapping("/{creditCardId}/consumptions")
+    public ResponseEntity<List<Consumption>> getAllConsumptions(@PathVariable("creditCardId")Long id){
+        List<Consumption>consumptions = creditCardService.findAllConsumption(id);
+        if(consumptions == null){
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().body(consumptions);
+    }
+
+
+    @PostMapping("/register-credit-card")
     public ResponseEntity<CreditCard> registerCreditCard(@RequestBody RBCreditCardRegistration rbCreditCardRegistration) {
 //        Credit creditBody = new Credit();
         CreditCard creditCardBody = new CreditCard();
@@ -58,6 +70,7 @@ public class CreditCardController {
         creditCardBody.setCustomer(customer);
         creditCardBody.setCustomerId(customer.getId());
         creditCardBody.setLimitCredit(rbCreditCardRegistration.getLimitCredit());
+        creditCardBody.setBalance(rbCreditCardRegistration.getLimitCredit());
 
         CreditCard creditCardDB = creditCardService.registerCreditCard(creditCardBody);
         if(creditCardDB == null){
@@ -65,6 +78,20 @@ public class CreditCardController {
         }
 
         return ResponseEntity.ok().body(creditCardDB);
+    }
+
+    @PostMapping("/{creditCardId}/register-consumption")
+    public ResponseEntity<Consumption> registerConsumption(@PathVariable("creditCardId")Long creditCardId,@RequestBody RBCreditCardConsumption rbCreditCardConsumption) {
+        CreditCard creditCardDB = creditCardService.findCreditCardById(creditCardId);
+        Consumption consumption = new Consumption();
+        consumption.setCreditCard(creditCardDB);
+        consumption.setAmount(rbCreditCardConsumption.getAmount());
+        consumption.setCreateAt(LocalDate.now());
+        consumption.setDetail(rbCreditCardConsumption.getDetail());
+
+        Consumption consumptionDB = creditCardService.saveConsumption(creditCardDB,consumption);
+
+        return ResponseEntity.ok().body(consumptionDB);
     }
 
 }

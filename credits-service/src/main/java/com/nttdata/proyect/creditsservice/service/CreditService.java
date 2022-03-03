@@ -19,7 +19,7 @@ public interface CreditService {
 
     Payment payAPayment(Payment payment);
 
-    void deleteCredit(Credit credit);
+//    void deleteCredit(Credit credit);
 
     Credit getCredit(Long id);
 

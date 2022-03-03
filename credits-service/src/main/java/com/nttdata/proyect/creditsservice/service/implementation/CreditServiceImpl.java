@@ -71,10 +71,10 @@ public class CreditServiceImpl implements CreditService {
         return paymentRepository.save(paymentDB);
     }
 
-    @Override
-    public void deleteCredit(Credit credit) {
-
-    }
+//    @Override
+//    public void deleteCredit(Credit credit) {
+//
+//    }
 
     @Override
     public Credit getCredit(Long id) {
