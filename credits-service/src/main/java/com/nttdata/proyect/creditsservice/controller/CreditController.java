@@ -95,7 +95,7 @@ public class CreditController {
         return ResponseEntity.ok().body(paymentUpdated);
     }
 
-    @PostMapping("/registerCredit")
+    @PostMapping("/register-credit")
     public ResponseEntity<Credit> createCredit(@RequestBody RBCreditRegistration rbCreditRegistration) {
         Credit creditBody = new Credit();
         Customer customer = customerClient.getCustomerById(rbCreditRegistration.getCustomerId()).getBody();
